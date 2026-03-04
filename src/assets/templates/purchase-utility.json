@@ -1,0 +1,44 @@
+{
+  "type": "PURCHASE_UTILITY",
+  "category": "utilities",
+  "method": "PURCHASE",
+  "description": "Коммунальные платежи",
+  "templateString": "PURCHASE {DATE} {UTILITY} WEB PAY {PHONE} {STATE}",
+  "placeholders": [
+    {
+      "name": "DATE",
+      "source": "date",
+      "format": "MMDD",
+      "required": true
+    },
+    {
+      "name": "UTILITY",
+      "source": "contractor",
+      "required": true,
+      "maxLength": 25,
+      "formatter": "uppercase",
+      "defaultOptions": [
+        "DUKE ENERGY OH",
+        "PACIFIC GAS",
+        "CON EDISON"
+      ]
+    },
+    {
+      "name": "PHONE",
+      "source": "random",
+      "required": true,
+      "options": [
+        "800-777-9898",
+        "800-743-5000"
+      ]
+    },
+    {
+      "name": "STATE",
+      "source": "companyInfo",
+      "field": "state",
+      "required": true,
+      "formatter": "uppercase"
+    }
+  ],
+  "example": "PURCHASE 0819 DUKE ENERGY OH WEB PAY 800-777-9898 OH"
+}

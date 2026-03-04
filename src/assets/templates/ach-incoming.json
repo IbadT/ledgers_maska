@@ -1,0 +1,51 @@
+{
+  "type": "ACH_INCOMING",
+  "category": "incoming_ach",
+  "method": "ACH",
+  "description": "ACH-пополнения от клиентов (B2B)",
+  "templateString": "{CONTRACTOR} DES:ACH Pmt ID:{PMT_ID} INDN:{COMPANY_NAME} CO ID:{CO_ID} CCD PMT INFO:{COMMENT}",
+  "placeholders": [
+    {
+      "name": "CONTRACTOR",
+      "source": "contractor",
+      "required": true,
+      "maxLength": 30,
+      "formatter": "uppercase"
+    },
+    {
+      "name": "PMT_ID",
+      "source": "generated",
+      "generatorType": "pmtId",
+      "length": 10,
+      "required": true
+    },
+    {
+      "name": "COMPANY_NAME",
+      "source": "companyInfo",
+      "field": "companyName",
+      "required": true,
+      "maxLength": 40,
+      "formatter": "uppercase"
+    },
+    {
+      "name": "CO_ID",
+      "source": "generated",
+      "generatorType": "coId",
+      "length": 10,
+      "required": true,
+      "deterministic": true
+    },
+    {
+      "name": "COMMENT",
+      "source": "random",
+      "required": true,
+      "options": [
+        "Settlement {date}",
+        "Payment Inv {randomId}",
+        "Service Fee",
+        "Monthly Invoice"
+      ]
+    }
+  ],
+  "example": "PACIFIC TRADERS DES:ACH Pmt ID:5023812514 INDN:Srb Autos LLC. CO ID:9200502238 CCD PMT INFO:Settlement 01/13/25-01/19/25"
+}

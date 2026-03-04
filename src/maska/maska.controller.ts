@@ -1,10 +1,5 @@
 import { Controller, Logger } from '@nestjs/common';
-import {
-  Ctx,
-  EventPattern,
-  Payload,
-  RmqContext,
-} from '@nestjs/microservices';
+import { Ctx, EventPattern, Payload, RmqContext } from '@nestjs/microservices';
 import { MaskaService } from './maska.service';
 import { MatematikaPayloadDto } from './dto/matematika-payload.dto';
 
@@ -48,6 +43,7 @@ export class MaskaController {
       this.logger.log('========================================');
 
       // TODO: добавить логику отправки в следующий микросервис
+      
     } catch (error) {
       this.logger.error('❌ ERROR processing message:', error.message);
       this.logger.error('Stack:', error.stack);

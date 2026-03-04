@@ -1,0 +1,62 @@
+{
+  "type": "CARD_FUEL",
+  "category": "card_fuel",
+  "method": "CHECKCARD",
+  "description": "Оплата топлива картой",
+  "templateString": "CHECKCARD {DATE} {STATION} {CITY} {STATE} CKCD {MERCHANT_CODE} XXXXXXXXXXXX{CARD_LAST4} {CARD_LAST4}",
+  "placeholders": [
+    {
+      "name": "DATE",
+      "source": "date",
+      "format": "MMDD",
+      "required": true
+    },
+    {
+      "name": "STATION",
+      "source": "contractor",
+      "required": true,
+      "maxLength": 25,
+      "formatter": "uppercase",
+      "defaultOptions": [
+        "CHEVRON/SPRING",
+        "EXXONMOBIL",
+        "SHELL",
+        "BP"
+      ]
+    },
+    {
+      "name": "CITY",
+      "source": "random",
+      "required": true,
+      "options": [
+        "RICHARDSON",
+        "FRESNO",
+        "BAKERSFIELD"
+      ],
+      "formatter": "uppercase"
+    },
+    {
+      "name": "STATE",
+      "source": "companyInfo",
+      "field": "state",
+      "required": true,
+      "formatter": "uppercase"
+    },
+    {
+      "name": "MERCHANT_CODE",
+      "source": "random",
+      "required": true,
+      "options": [
+        "5541",
+        "5542",
+        "5983"
+      ]
+    },
+    {
+      "name": "CARD_LAST4",
+      "source": "card",
+      "required": true
+    }
+  ],
+  "example": "CHECKCARD 0809 CHEVRON/SPRING RICHARDSON TX CKCD 5541 XXXXXXXXXXXX9017 9017"
+}

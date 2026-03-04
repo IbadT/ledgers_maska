@@ -1,0 +1,38 @@
+{
+  "type": "PURCHASE_GENERIC",
+  "category": "card_purchase",
+  "method": "PURCHASE",
+  "description": "Универсальный PURCHASE для онлайн-платежей",
+  "templateString": "PURCHASE {DATE} {MERCHANT} WEB PAY {PHONE} {STATE}",
+  "placeholders": [
+    {
+      "name": "DATE",
+      "source": "date",
+      "format": "MMDD",
+      "required": true
+    },
+    {
+      "name": "MERCHANT",
+      "source": "contractor",
+      "required": true,
+      "maxLength": 25,
+      "formatter": "uppercase"
+    },
+    {
+      "name": "PHONE",
+      "source": "random",
+      "required": true,
+      "options": [
+        "800-000-0000",
+        "888-888-8888"
+      ]
+    },
+    {
+      "name": "STATE",
+      "source": "companyInfo",
+      "field": "state",
+      "required": true,
+      "formatter": "uppercase"
+    }
+  ]
+}

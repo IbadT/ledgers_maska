@@ -1,0 +1,24 @@
+{
+  "type": "OWNER_TRANSFER",
+  "category": "owner_transfer",
+  "method": "INTERNAL",
+  "description": "Перевод владельцу (исходящий)",
+  "templateString": "ONLINE BANKING TRANSFER TO SAV {ACCOUNT_LAST4} CONF# {CONFIRM}",
+  "placeholders": [
+    {
+      "name": "ACCOUNT_LAST4",
+      "source": "companyInfo",
+      "field": "accountNumber",
+      "required": true,
+      "fallback": "1234"
+    },
+    {
+      "name": "CONFIRM",
+      "source": "generated",
+      "generatorType": "confirm",
+      "length": 10,
+      "required": true
+    }
+  ],
+  "example": "ONLINE BANKING TRANSFER TO SAV 1234 CONF# 9501732841"
+}

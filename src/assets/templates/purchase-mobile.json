@@ -1,0 +1,45 @@
+{
+  "type": "PURCHASE_MOBILE",
+  "category": "mobile_phone",
+  "method": "PURCHASE",
+  "description": "Оплата мобильной связи",
+  "templateString": "PURCHASE {DATE} {OPERATOR} WEB PAYM {PHONE} {STATE}",
+  "placeholders": [
+    {
+      "name": "DATE",
+      "source": "date",
+      "format": "MMDD",
+      "required": true
+    },
+    {
+      "name": "OPERATOR",
+      "source": "contractor",
+      "required": true,
+      "maxLength": 20,
+      "formatter": "uppercase",
+      "defaultOptions": [
+        "T-MOBILE",
+        "VERIZON",
+        "AT&T"
+      ]
+    },
+    {
+      "name": "PHONE",
+      "source": "random",
+      "required": true,
+      "options": [
+        "877-453-1304",
+        "800-922-0204",
+        "611"
+      ]
+    },
+    {
+      "name": "STATE",
+      "source": "companyInfo",
+      "field": "state",
+      "required": true,
+      "formatter": "uppercase"
+    }
+  ],
+  "example": "PURCHASE 0812 T-MOBILE WEB PAYM 877-453-1304 WA"
+}

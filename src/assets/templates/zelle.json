@@ -1,0 +1,35 @@
+{
+  "type": "ZELLE_TRANSFER",
+  "category": "zelle_incoming",
+  "method": "ZELLE",
+  "description": "Zelle переводы",
+  "templateString": "Zelle Transfer Conf# {CONFIRM}; {OWNER_LASTNAME}, {OWNER_FIRSTNAME}",
+  "placeholders": [
+    {
+      "name": "CONFIRM",
+      "source": "generated",
+      "generatorType": "confirm",
+      "length": 8,
+      "required": true
+    },
+    {
+      "name": "OWNER_LASTNAME",
+      "source": "companyInfo",
+      "field": "ownerName",
+      "transform": "lastname",
+      "required": true,
+      "maxLength": 20,
+      "formatter": "uppercase"
+    },
+    {
+      "name": "OWNER_FIRSTNAME",
+      "source": "companyInfo",
+      "field": "ownerName",
+      "transform": "firstname",
+      "required": true,
+      "maxLength": 20,
+      "formatter": "uppercase"
+    }
+  ],
+  "example": "Zelle Transfer Conf# 12345678; SMITH, JOHN"
+}

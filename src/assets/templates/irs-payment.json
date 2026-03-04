@@ -1,0 +1,32 @@
+{
+  "type": "IRS_PAYMENT",
+  "category": "irs_payment",
+  "method": "ACH",
+  "description": "Оплата налогов IRS",
+  "templateString": "IRS DES:USATAXPYMT ID:{TAX_ID} INDN:{COMPANY_NAME} CO ID:{CO_ID} CCD",
+  "placeholders": [
+    {
+      "name": "TAX_ID",
+      "source": "generated",
+      "generatorType": "taxId",
+      "length": 12,
+      "required": true
+    },
+    {
+      "name": "COMPANY_NAME",
+      "source": "companyInfo",
+      "field": "companyName",
+      "required": true,
+      "maxLength": 40,
+      "formatter": "uppercase"
+    },
+    {
+      "name": "CO_ID",
+      "source": "generated",
+      "generatorType": "coId",
+      "length": 10,
+      "required": true
+    }
+  ],
+  "example": "IRS DES:USATAXPYMT ID:551234567890 INDN:SRB AUTOS LLC CO ID:8877665545 CCD"
+}

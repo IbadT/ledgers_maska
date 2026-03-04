@@ -1,0 +1,37 @@
+{
+  "type": "GATEWAY_DEPOSIT",
+  "category": "gateway_deposit",
+  "method": "GATEWAY",
+  "description": "Пополнения через платежный шлюз (Stripe, Square, PayPal)",
+  "templateString": "{GATEWAY} DES:DEPOSIT ID:{PMT_ID} INDN:{COMPANY_NAME}",
+  "placeholders": [
+    {
+      "name": "GATEWAY",
+      "source": "random",
+      "required": true,
+      "options": [
+        "STRIPE",
+        "SQUARE",
+        "PAYPAL",
+        "SHOPIFY"
+      ],
+      "formatter": "uppercase"
+    },
+    {
+      "name": "PMT_ID",
+      "source": "generated",
+      "generatorType": "pmtId",
+      "length": 15,
+      "required": true
+    },
+    {
+      "name": "COMPANY_NAME",
+      "source": "companyInfo",
+      "field": "companyName",
+      "required": true,
+      "maxLength": 40,
+      "formatter": "uppercase"
+    }
+  ],
+  "example": "STRIPE DES:DEPOSIT ID:524771991099581 INDN:ACME TRUCKING LLC"
+}

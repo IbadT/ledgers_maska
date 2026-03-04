@@ -1,0 +1,628 @@
+📋 ЭТАП 1: ИНИЦИАЛИЗАЦИЯ ПРОЕКТА (NestJS)
+1.1 Создание проекта
+bash
+Copy
+# 1.1.1 Установка NestJS CLI глобально
+npm i -g @nestjs/cli
+
+# 1.1.2 Создание нового проекта
+nest new maska-service
+
+# 1.1.3 Выбор пакетного менеджера (npm/yarn/pnpm)
+
+# 1.1.4 Переход в директорию проекта
+cd maska-service
+1.2 Установка базовых зависимостей
+bash
+Copy
+# 1.2.1 Установка core-зависимостей NestJS
+npm install @nestjs/config @nestjs/common @nestjs/core @nestjs/platform-express
+
+# 1.2.2 Установка валидации и трансформации данных
+npm install class-validator class-transformer
+
+# 1.2.3 Установка для работы с CSV
+npm install csv-parser fast-csv
+
+# 1.2.4 Установка утилит для работы с датами
+npm install date-fns
+
+# 1.2.5 Установка для логирования (опционально, pino)
+npm install nestjs-pino pino-pretty
+
+# 1.2.6 Установка типов для TypeScript
+npm install -D @types/node @types/csv-parse
+1.3 Настройка структуры проекта
+plain
+Copy
+src/
+├── main.ts                          # Точка входа
+├── app.module.ts                    # Корневой модуль
+├── config/                          # Конфигурация
+│   ├── app.config.ts               # Базовые настройки
+│   ├── csv.config.ts               # Пути к CSV-файлам
+│   └── template.config.ts          # Настройки шаблонов
+├── modules/
+│   ├── maska/                      # Основной модуль маскировки
+│   │   ├── maska.module.ts
+│   │   ├── maska.controller.ts
+│   │   ├── maska.service.ts
+│   │   ├── dto/                    # DTO для входа/выхода
+│   │   │   ├── input.dto.ts       # Вход от Matematika
+│   │   │   └── output.dto.ts      # Выход с description
+│   │   └── interfaces/
+│   │       ├── transaction.interface.ts
+│   │       └── forwarding-info.interface.ts
+│   ├── templates/                   # Модуль шаблонов
+│   │   ├── templates.module.ts
+│   │   ├── templates.service.ts
+│   │   ├── templates.loader.ts     # Загрузка шаблонов
+│   │   └── entities/
+│   │       └── template.entity.ts
+│   ├── contractors/                 # Модуль контрагентов
+│   │   ├── contractors.module.ts
+│   │   ├── contractors.service.ts
+│   │   ├── csv-loader.service.ts   # Загрузка CSV
+│   │   └── entities/
+│   │       └── contractor.entity.ts
+│   └── generators/                  # Модуль генераторов ID
+│       ├── generators.module.ts
+│       ├── id-generator.service.ts
+│       └── confirm-generator.service.ts
+├── shared/                          # Общие компоненты
+│   ├── constants/
+│   │   ├── template-types.ts       # Константы типов шаблонов
+│   │   └── csv-file-names.ts       # Имена CSV-файлов
+│   ├── utils/
+│   │   ├── string.utils.ts         # Утилиты для строк
+│   │   └── date.utils.ts           # Утилиты для дат
+│   └── types/
+│       └── transaction-types.ts
+└── assets/                          # CSV-файлы и конфиги
+    ├── templates/
+    │   ├── ach-incoming.json
+    │   ├── wire-transfer.json
+    │   ├── internal-transfer.json
+    │   ├── zelle.json
+    │   ├── atm.json
+    │   ├── card-checkcard.json
+    │   ├── card-purchase.json
+    │   ├── payroll.json
+    │   ├── irs.json
+    │   └── gateway-deposit.json
+    └── csv/
+        ├── gateways.csv
+        ├── retails_ca.csv
+        ├── retails_tx.csv
+        ├── fleet_ca.csv
+        ├── fleet_tx.csv
+        ├── software_transport.csv
+        ├── bookkeeper_ca.csv
+        ├── bookkeeper_tx.csv
+        ├── insurance.csv
+        └── marketing.csv
+📋 ЭТАП 2: КОНФИГУРАЦИЯ И ОКРУЖЕНИЕ
+2.1 Файл конфигурации окружения .env
+env
+Copy
+# 2.1.1 Порт сервиса
+PORT=3002
+
+# 2.1.2 Пути к ресурсам
+CSV_BASE_PATH=./src/assets/csv
+TEMPLATES_BASE_PATH=./src/assets/templates
+
+# 2.1.3 Настройки генерации ID
+ID_LENGTH=10
+CONFIRM_LENGTH=10
+CO_ID_LENGTH=10
+
+# 2.1.4 Настройки логирования
+LOG_LEVEL=debug
+
+# 2.1.5 Настройки валидации
+MAX_CUSTOM_CONTRACTORS_PER_CATEGORY=5
+MAX_COMPANY_NAME_LENGTH=40
+2.2 Конфигурационные модули NestJS
+2.2.1 Создать src/config/app.config.ts:
+TypeScript
+Copy
+// Должен экспортировать объект конфигурации с портом, логированием, путями
+// Должен использовать process.env с дефолтными значениями
+// Должен валидировать обязательные переменные
+2.2.2 Создать src/config/csv.config.ts:
+TypeScript
+Copy
+// Должен содержать маппинг категорий к CSV-файлам
+// Пример: { 'fuel': 'fleet_{state}.csv', 'retail': 'retails_{state}.csv' }
+// Должен поддерживать подстановку штата в имя файла
+2.2.3 Создать src/config/template.config.ts:
+TypeScript
+Copy
+// Должен содержать маппинг category + method → templateType
+// Пример: { category: 'incoming_ach', method: 'ACH' } → 'ACH_INCOMING'
+// Должен содержать настройки форматирования для каждого типа
+📋 ЭТАП 3: ОПРЕДЕЛЕНИЕ ТИПОВ И ИНТЕРФЕЙСОВ
+3.1 Входные интерфейсы (от Matematika)
+3.1.1 Создать src/modules/maska/interfaces/transaction.interface.ts:
+TypeScript
+Copy
+// Должен описывать входную транзакцию:
+// - transactionDate: string (ISO 8601)
+// - postingDate: string (YYYY-MM-DD)
+// - amount: number
+// - balanceAfter: number
+// - category: string (техническая категория)
+// - method: string (способ платежа)
+// - transactionId?: string
+// - isManual?: boolean
+// - FixAsFirst?: boolean
+// - associatedCard?: string (последние 4 цифры)
+// - calculationDetails?: { quantity: number; rate: number; unit: string }
+// - contractorIndex?: number (индекс контрагента в категории)
+// - state?: string (штата для выбора CSV)
+3.1.2 Создать src/modules/maska/interfaces/forwarding-info.interface.ts:
+TypeScript
+Copy
+// Должен содержать:
+// - companyInfo: {
+//     companyName: string;        // INDN в шаблонах
+//     ownerName?: string;         // Для подписей
+//     state: string;              // Штат для выбора CSV
+//     accountNumber?: string;     // Для внутренних переводов
+//   }
+// - customCustomers?: string[];   // Пользовательские клиенты (доходы)
+// - customContractors?: Map<string, string[]>; // Категория → массив имен
+// - persistentContractors?: {     // "Зелёные" контрагенты
+//     [category: string]: string;
+//   }
+// - cards?: string[];             // Список карт (последние 4 цифры)
+3.2 Выходные интерфейсы
+3.2.1 Создать src/modules/maska/interfaces/output-transaction.interface.ts:
+TypeScript
+Copy
+// Должен содержать:
+// - transactionDate: string
+// - postingDate: string
+// - description: string (сформированное мемо)
+// - amount: number
+// - balanceAfter: number
+3.3 DTO с валидацией
+3.2.2 Создать src/modules/maska/dto/input.dto.ts:
+TypeScript
+Copy
+// Должен использовать class-validator:
+// - @IsArray() transactions: TransactionInputDto[]
+// - @ValidateNested() forwardingInfo: ForwardingInfoDto
+// - @IsString() forwardingInfo.companyInfo.companyName
+// - @IsOptional() @IsString() для опциональных полей
+// - @IsNumber() для сумм
+3.2.3 Создать src/modules/maska/dto/output.dto.ts:
+TypeScript
+Copy
+// Должен описывать структуру ответа
+// - @IsArray() transactions: OutputTransactionDto[]
+📋 ЭТАП 4: МОДУЛЬ ШАБЛОНОВ (TemplatesModule)
+4.1 Сущность шаблона
+4.1.1 Создать src/modules/templates/entities/template.entity.ts:
+TypeScript
+Copy
+// Должен содержать:
+// - type: TemplateType (enum: ACH_INCOMING, WIRE_TRANSFER, INTERNAL_TRANSFER, 
+//   ZELLE, ATM, CARD_CHECKCARD, CARD_PURCHASE, PAYROLL, IRS, GATEWAY_DEPOSIT)
+// - category: string (техническая категория)
+// - method: string (способ платежа)
+// - templateString: string (шаблон с плейсхолдерами)
+// - requiredFields: string[] (список обязательных полей)
+// - optionalFields: string[] (опциональные поля)
+// - formatters: Map<string, Function> (функции форматирования полей)
+4.2 Загрузчик шаблонов
+4.2.1 Создать src/modules/templates/templates.loader.ts:
+TypeScript
+Copy
+// Должен:
+// 1. При старте приложения загружать все JSON-файлы из assets/templates/
+// 2. Парсить каждый файл в TemplateEntity
+// 3. Сохранять в Map<type, TemplateEntity>
+// 4. Предоставлять метод getTemplate(category, method): TemplateEntity
+// 5. Кэшировать результаты
+4.2.2 Структура JSON-шаблона (ach-incoming.json):
+JSON
+Copy
+{
+  "type": "ACH_INCOMING",
+  "category": "incoming_ach",
+  "method": "ACH",
+  "template": "{CONTRACTOR} DES:ACH Pmt ID:{PMT_ID} INDN:{COMPANY_NAME} CO ID:{CO_ID} CCD PMT INFO:{COMMENT}",
+  "placeholders": {
+    "CONTRACTOR": { "source": "contractor", "maxLength": 30 },
+    "PMT_ID": { "source": "generated", "generator": "numericId", "length": 10 },
+    "COMPANY_NAME": { "source": "companyInfo.companyName" },
+    "CO_ID": { "source": "generated", "generator": "coId", "length": 10 },
+    "COMMENT": { "source": "random", "options": ["Settlement {date}", "Payment Inv {id}", "Service Fee"] }
+  }
+}
+4.3 Сервис шаблонов
+4.3.1 Создать src/modules/templates/templates.service.ts:
+TypeScript
+Copy
+// Должен предоставлять методы:
+// - resolveTemplate(transaction, forwardingInfo, contractorName): string
+//   1. Определить тип шаблона по category + method
+//   2. Получить TemplateEntity из loader
+//   3. Для каждого placeholder:
+//      - Если source === 'contractor' → подставить contractorName
+//      - Если source === 'companyInfo.x' → взять из forwardingInfo
+//      - Если source === 'generated' → вызвать GeneratorsService
+//      - Если source === 'random' → выбрать случайный вариант
+//      - Если source === 'transaction.x' → взять из транзакции
+//   4. Применить formatters (uppercase, обрезка до maxLength)
+//   5. Вернуть итоговую строку
+📋 ЭТАП 5: МОДУЛЬ ГЕНЕРАТОРОВ (GeneratorsModule)
+5.1 Генератор ID
+5.1.1 Создать src/modules/generators/id-generator.service.ts:
+TypeScript
+Copy
+// Должен предоставлять:
+// - generateNumericId(length: number): string
+//   Генерация случайного числа заданной длины, детерминированная при необходимости
+// - generateCoId(contractorName: string): string
+//   Генерация CO ID для ACH (может быть хеш от имени для консистентности)
+// - generateConfirmNumber(): string
+//   Генерация Confirmation# (10 цифр)
+// - generatePmtId(): string
+//   Генерация Pmt ID (10 цифр)
+// - generateAtmId(): string
+//   Генерация ATM ID (8 цифр)
+5.2 Детерминированная генерация
+5.1.2 Реализовать логику консистентности:
+TypeScript
+Copy
+// Для CO ID:
+// - Если contractorName уже встречался → вернуть сохранённый CO ID
+// - Иначе сгенерировать новый, сохранить в Map<contractorName, coId>
+// - Очистка кэша при завершении обработки месяца
+
+// Для карт:
+// - Если associatedCard указан → использовать его
+// - Иначе выбрать случайную из cards во forwardingInfo
+// - Сохранить выбор для транзакций одного месяца
+📋 ЭТАП 6: МОДУЛЬ КОНТРАГЕНТОВ (ContractorsModule)
+6.1 Загрузчик CSV
+6.1.1 Создать src/modules/contractors/csv-loader.service.ts:
+TypeScript
+Copy
+// Должен:
+// - Иметь метод loadCsv(fileName: string): Promise<string[]>
+// - Читать файл из CSV_BASE_PATH
+// - Использовать csv-parser для парсинга
+// - Возвращать массив имён компаний (первую колонку)
+// - Кэшировать результаты (не читать один файл дважды)
+// - Обрабатывать подстановку штата: fleet_{state}.csv → fleet_ca.csv
+6.2 Сервис контрагентов
+6.1.2 Создать src/modules/contractors/contractors.service.ts:
+TypeScript
+Copy
+// Должен предоставлять:
+// - getDefaultContractors(category: string, state: string, count: number): string[]
+//   1. Определить имя CSV-файла по категории и штату
+//   2. Загрузить список через csv-loader
+//   3. Если список пуст → вернуть дефолтные значения
+//   4. Выбрать count уникальных случайных элементов
+//   5. Если persistentContractors[category] существует → 
+//      заменить один из выбранных на persistent
+
+// - mergeWithCustom(
+//     defaults: string[], 
+//     customs: string[], 
+//     category: string
+//   ): { merged: string[]; mapping: Map<number, number> }
+//   1. Проверить customs.length <= defaults.length (иначе ошибка)
+//   2. Создать копию defaults
+//   3. Заменить первые customs.length элементов на customs
+//   4. Вернуть mapping: какой индекс defaults на какой индекс customs заменён
+//   5. Сохранить mapping для использования при распределении транзакций
+
+// - getContractorForTransaction(
+//     category: string,
+//     contractorIndex: number,
+//     forwardingInfo: ForwardingInfo
+//   ): string
+//   1. Получить список дефолтных контрагентов для категории
+//   2. Если есть customContractors[category]:
+//      - Применить mergeWithCustom
+//      - Использовать mapping для определения замены
+//   3. Вернуть имя контрагента по индексу
+📋 ЭТАП 7: ЯДРО МАСКИРОВКИ (MaskaService)
+7.1 Основной сервис
+7.1.1 Создать src/modules/maska/maska.service.ts:
+TypeScript
+Copy
+@Injectable()
+export class MaskaService {
+  constructor(
+    private readonly templatesService: TemplatesService,
+    private readonly contractorsService: ContractorsService,
+    private readonly generatorsService: GeneratorsService,
+  ) {}
+
+  // 7.1.2 Метод обработки входных данных
+  async processTransactions(input: MaskaInputDto): Promise<MaskaOutputDto> {
+    // Шаг 1: Валидация входных данных
+    this.validateInput(input);
+    
+    // Шаг 2: Подготовка контекста
+    const context = this.prepareContext(input.forwardingInfo);
+    
+    // Шаг 3: Сортировка транзакций по дате (с учётом FixAsFirst)
+    const sortedTransactions = this.sortTransactions(input.transactions);
+    
+    // Шаг 4: Группировка транзакций по категориям для оптимизации
+    const groupedByCategory = this.groupByCategory(sortedTransactions);
+    
+    // Шаг 5: Обработка каждой транзакции
+    const processedTransactions = await Promise.all(
+      sortedTransactions.map(tx => this.processSingleTransaction(tx, context))
+    );
+    
+    // Шаг 6: Формирование выходного JSON
+    return { transactions: processedTransactions };
+  }
+
+  // 7.1.3 Обработка одной транзакции
+  private async processSingleTransaction(
+    tx: TransactionInput,
+    context: ProcessingContext
+  ): Promise<OutputTransaction> {
+    // Определить категорию и метод
+    const { category, method } = tx;
+    
+    // Получить имя контрагента (с учётом custom)
+    const contractorName = await this.getContractorName(tx, context);
+    
+    // Сгенерировать description через TemplatesService
+    const description = await this.templatesService.resolveTemplate(
+      tx,
+      context.forwardingInfo,
+      contractorName
+    );
+    
+    // Вернуть объект с description
+    return {
+      transactionDate: tx.transactionDate,
+      postingDate: tx.postingDate,
+      description,
+      amount: tx.amount,
+      balanceAfter: tx.balanceAfter,
+    };
+  }
+
+  // 7.1.4 Определение имени контрагента
+  private async getContractorName(
+    tx: TransactionInput,
+    context: ProcessingContext
+  ): Promise<string> {
+    // Если у транзакции есть contractorIndex:
+    // - Получить список дефолтных для категории
+    // - Применить замену на custom, если есть
+    // - Вернуть контрагент по индексу
+    
+    // Для специальных случаев (Zelle, ATM) - своя логика
+  }
+
+  // 7.1.5 Обработка calculationDetails
+  private formatCalculationDetails(tx: TransactionInput): string {
+    // Если tx.calculationDetails существует:
+    // - Формат: "{quantity} {unit} @ ${rate}"
+    // - Пример: "36 HR @ $4.10"
+    // - Вставить в шаблон вместо {CALCULATION}
+  }
+}
+7.2 Валидация
+7.1.6 Методы валидации:
+TypeScript
+Copy
+private validateInput(input: MaskaInputDto): void {
+  // Проверить, что companyInfo.companyName существует
+  // Проверить, что customContractors не превышает лимит
+  // Проверить, что для каждой категории в customContractors 
+  // количество не больше дефолтных контрагентов
+  // Проверить длины строк (companyName <= 40 символов)
+  // Проверить формат дат
+}
+📋 ЭТАП 8: КОНТРОЛЛЕР И API
+8.1 REST API
+8.1.1 Создать src/modules/maska/maska.controller.ts:
+TypeScript
+Copy
+@Controller('maska')
+export class MaskaController {
+  constructor(private readonly maskaService: MaskaService) {}
+
+  @Post('process')
+  @HttpCode(200)
+  async processTransactions(
+    @Body() input: MaskaInputDto
+  ): Promise<MaskaOutputDto> {
+    return this.maskaService.processTransactions(input);
+  }
+
+  @Post('validate')
+  @HttpCode(200)
+  validateInput(
+    @Body() input: MaskaInputDto
+  ): { valid: boolean; errors?: string[] } {
+    // Эндпоинт для предварительной валидации без обработки
+  }
+}
+8.2 Глобальные перехватчики
+8.1.2 Настроить в main.ts:
+TypeScript
+Copy
+// Глобальный ValidationPipe с transform: true
+// Глобальный ExceptionFilter для обработки ошибок
+// Глобальный Logger (Pino)
+// Префикс /api/v1
+📋 ЭТАП 9: ОБРАБОТКА СПЕЦИАЛЬНЫХ СЛУЧАЕВ
+9.1 Обработка карт
+9.1.1 Логика в TemplatesService:
+TypeScript
+Copy
+// Для шаблонов с {CARD_LAST4}:
+// - Если transaction.associatedCard → использовать его
+// - Иначе если forwardingInfo.cards → выбрать случайную
+// - Иначе → '0000'
+// - Формат: XXXXXXXXXXXX{last4}
+9.2 Обработка дат в шаблонах
+9.1.2 Форматирование дат:
+TypeScript
+Copy
+// {DATE} → MM/DD (для ATM: 08/01)
+// {DATETIME} → MM/DD/YYYY HH:mm
+// {PAYDATE} → MMDD (для Payroll: 0826)
+// Использовать date-fns для форматирования
+9.3 Обработка calculationDetails
+9.1.3 Специальные шаблоны для аренды:
+TypeScript
+Copy
+// Категория "chassis_rental":
+// Шаблон: "CCD DEBIT {CONTRACTOR} CHASSIS USAGE {CALCULATION} ID:{ID} INDN:{COMPANY}..."
+// {CALCULATION} заменяется на "36 HR @ $4.10"
+📋 ЭТАП 10: ТЕСТИРОВАНИЕ
+10.1 Unit-тесты
+10.1.1 Тесты для GeneratorsService:
+TypeScript
+Copy
+// - Проверить длину генерируемых ID
+// - Проверить детерминированность CO ID для одного контрагента
+// - Проверить уникальность ConfirmNumber
+10.1.2 Тесты для ContractorsService:
+TypeScript
+Copy
+// - Проверить загрузку CSV
+// - Проверить mergeWithCustom (правильное количество замен)
+// - Проверить ошибку при превышении лимита custom
+10.1.3 Тесты для TemplatesService:
+TypeScript
+Copy
+// - Проверить все типы шаблонов
+// - Проверить подстановку всех placeholder'ов
+// - Проверить обрезку длинных строк
+10.2 E2E тесты
+10.1.4 Создать test/maska.e2e-spec.ts:
+TypeScript
+Copy
+// Тесты для полного цикла:
+// - POST /maska/process с полным набором транзакций
+// - Проверка формата выходного description для каждого типа
+// - Проверка замены custom контрагентов
+// - Проверка сохранения балансов и сумм
+📋 ЭТАП 11: ДОКУМЕНТАЦИЯ И ДЕПЛОЙ
+11.1 Документация API
+11.1.1 Настроить Swagger:
+TypeScript
+Copy
+// @nestjs/swagger в main.ts
+// Документирование всех DTO с @ApiProperty
+// Примеры запросов/ответов
+11.2 Docker
+11.1.2 Создать Dockerfile:
+dockerfile
+Copy
+# Многоэтапная сборка
+# Этап 1: Build (node:18-alpine)
+# Этап 2: Production (node:18-alpine без devDependencies)
+# Копирование assets/csv и assets/templates
+# HEALTHCHECK
+11.1.3 Создать docker-compose.yml:
+yaml
+Copy
+// Сервис maska-service
+// Порты: 3002:3002
+// Volumes для CSV (для обновления без пересборки)
+// Переменные окружения из .env
+🔄 ПОЛНЫЙ ПОТОК ДАННЫХ (ЧТО ПРИНИМАЕТСЯ → ЧТО ПРОИСХОДИТ → ЧТО ОТПРАВЛЯЕТСЯ)
+Вход (от Matematika):
+JSON
+Copy
+{
+  "transactions": [
+    {
+      "transactionDate": "2025-01-20T12:00:00",
+      "postingDate": "2025-01-20",
+      "amount": -4900.00,
+      "balanceAfter": 159546.76,
+      "category": "owner_transfer",
+      "method": "INTERNAL",
+      "FixAsFirst": true
+    },
+    {
+      "transactionDate": "2025-01-21T11:30:00",
+      "postingDate": "2025-01-21",
+      "amount": 8100.00,
+      "balanceAfter": 167646.76,
+      "category": "incoming_ach",
+      "method": "ACH",
+      "contractorIndex": 0,
+      "state": "CA"
+    }
+  ],
+  "forwardingInfo": {
+    "companyInfo": {
+      "companyName": "Srb Autos LLC",
+      "state": "CA"
+    },
+    "customCustomers": ["Super LLC"],
+    "customContractors": {
+      "fuel": ["LumNuft Inc"]
+    }
+  }
+}
+Обработка:
+Валидация → проверка структуры
+Сортировка → по transactionDate (FixAsFirst для равных)
+Для каждой транзакции:
+Определение шаблона по category + method
+Получение контрагента (с заменой custom)
+Генерация ID (Confirm#, Pmt ID, CO ID)
+Подстановка в шаблон
+Форматирование (uppercase, обрезка)
+Формирование выхода
+Выход (клиенту):
+JSON
+Copy
+{
+  "transactions": [
+    {
+      "transactionDate": "2025-01-20T12:00:00",
+      "postingDate": "2025-01-20",
+      "description": "ONLINE BANKING TRANSFER TO SAV 1234 CONF# 9501732841",
+      "amount": -4900.00,
+      "balanceAfter": 159546.76
+    },
+    {
+      "transactionDate": "2025-01-21T11:30:00",
+      "postingDate": "2025-01-21",
+      "description": "SUPER LLC DES:ACH Pmt ID:1122334456 INDN:Srb Autos LLC. CO ID:8877665545 CCD PMT INFO:PAYMENT INV 1088",
+      "amount": 8100.00,
+      "balanceAfter": 167646.76
+    }
+  ]
+}
+📊 СУММАРНАЯ ТАБЛИЦА: ТИПЫ ТРАНЗАКЦИЙ И ИХ ОБРАБОТКА
+Table
+Категория	Метод	Шаблон	Ключевые поля	Особенности
+incoming_ach	ACH	{CONTRACTOR} DES:ACH Pmt ID:{ID} INDN:{COMPANY} CO ID:{CO_ID} CCD PMT INFO:{COMMENT}	contractor, pmtId, coId	Замена на customCustomers
+wire_incoming	WIRE	Wire Transfer ... {DATETIME} ... {BANK}	dateTime, bankName	-
+internal_transfer	INTERNAL	Online Banking transfer {DIRECTION} {ACCOUNT} Confirmation# {CONFIRM}	direction, accountLast4, confirm	Для owner_transfer
+gateway_deposit	GATEWAY	{GATEWAY} DES:DEPOSIT ID:{ID} INDN:{COMPANY}	gatewayName	Из gateways.csv
+zelle	ZELLE	Zelle Transfer Conf# {CONFIRM}; {LASTNAME}, {FIRSTNAME}	confirm, ownerName	-
+atm	ATM	BKOFAMERICA ATM {DATE} #{ATM_ID} {TYPE} {CITY} {STATE}	date, atmId, city, state	-
+card_fuel	CHECKCARD	CHECKCARD {DATE} {STATION} {CITY} {STATE} CKCD {CODE} XXXXXXXXXXXX{CARD}	station, cardLast4	Замена на customContractors
+card_subscription	CHECKCARD	CHECKCARD {DATE} {SERVICE} ... RECURRING ...	serviceName	RECURRING маркер
+purchase_mobile	PURCHASE	PURCHASE {DATE} {OPERATOR} WEB PAYM {PHONE} {STATE}	operator, phone	-
+purchase_utility	PURCHASE	PURCHASE {DATE} {COMPANY} WEB PAY {PHONE} {STATE}	company, phone	-
+payroll	ACH	{PROVIDER} DES:PAYROLL ID:{ID} INDN:{COMPANY} PAYDATE {PAYDATE}	provider, paydate	MMDD формат
+irs	ACH	IRS DES:USATAXPYMT ID:{ID} INDN:{COMPANY} CO ID:{ID} CCD	taxId	-
+chassis_rental	ACH	CCD DEBIT {CONTRACTOR} CHASSIS USAGE {CALC} ID:{ID} INDN:{COMPANY}	calculationDetails	Формат: "36 HR @ $4.10"
+Этот план покрывает все аспекты ТЗ и готов к реализации на NestJS. Каждый пункт может быть преобразован в конкретную задачу в трекере.

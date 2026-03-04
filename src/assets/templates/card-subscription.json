@@ -1,0 +1,44 @@
+{
+  "type": "CARD_SUBSCRIPTION",
+  "category": "card_subscription",
+  "method": "CHECKCARD",
+  "description": "Рекуррентные платежи за ПО",
+  "templateString": "CHECKCARD {DATE} {SERVICE} RECURRING CKCD {MERCHANT_CODE} XXXXXXXXXXXX{CARD_LAST4} {CARD_LAST4}",
+  "placeholders": [
+    {
+      "name": "DATE",
+      "source": "date",
+      "format": "MMDD",
+      "required": true
+    },
+    {
+      "name": "SERVICE",
+      "source": "contractor",
+      "required": true,
+      "maxLength": 20,
+      "formatter": "uppercase",
+      "defaultOptions": [
+        "HLUHULU",
+        "ADOBE",
+        "MICROSOFT",
+        "QUICKBOOKS"
+      ]
+    },
+    {
+      "name": "MERCHANT_CODE",
+      "source": "random",
+      "required": true,
+      "options": [
+        "4899",
+        "5734",
+        "7372"
+      ]
+    },
+    {
+      "name": "CARD_LAST4",
+      "source": "card",
+      "required": true
+    }
+  ],
+  "example": "CHECKCARD 0808 HLUHULU RECURRING CKCD 4899 XXXXXXXXXXXX9017 9017"
+}

@@ -1,0 +1,42 @@
+{
+  "type": "ATM_DEPOSIT",
+  "category": "atm_deposit",
+  "method": "ATM",
+  "description": "Депозит через ATM Bank of America",
+  "templateString": "BKOFAMERICA ATM {DATE} #{ATM_ID} DEPOSIT {CITY} {STATE}",
+  "placeholders": [
+    {
+      "name": "DATE",
+      "source": "date",
+      "format": "MM/DD",
+      "required": true
+    },
+    {
+      "name": "ATM_ID",
+      "source": "generated",
+      "generatorType": "atmId",
+      "length": 8,
+      "required": true
+    },
+    {
+      "name": "CITY",
+      "source": "random",
+      "required": true,
+      "options": [
+        "MODESTO",
+        "FRESNO",
+        "BAKERSFIELD",
+        "STOCKTON"
+      ],
+      "formatter": "uppercase"
+    },
+    {
+      "name": "STATE",
+      "source": "companyInfo",
+      "field": "state",
+      "required": true,
+      "formatter": "uppercase"
+    }
+  ],
+  "example": "BKOFAMERICA ATM 08/01 #000009848 DEPOSIT MODESTO CA"
+}

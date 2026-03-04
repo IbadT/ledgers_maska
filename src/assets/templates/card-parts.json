@@ -1,0 +1,51 @@
+{
+  "type": "CARD_PARTS",
+  "category": "parts_pos",
+  "method": "CHECKCARD",
+  "description": "Покупка запчастей в магазине (POS)",
+  "templateString": "CHECKCARD {DATE} {STORE} {STATE} CKCD {MERCHANT_CODE} XXXXXXXXXXXX{CARD_LAST4} {CARD_LAST4}",
+  "placeholders": [
+    {
+      "name": "DATE",
+      "source": "date",
+      "format": "MMDD",
+      "required": true
+    },
+    {
+      "name": "STORE",
+      "source": "contractor",
+      "required": true,
+      "maxLength": 20,
+      "formatter": "uppercase",
+      "defaultOptions": [
+        "NAPA",
+        "OREILLY",
+        "AUTOZONE",
+        "ADVANCE"
+      ]
+    },
+    {
+      "name": "STATE",
+      "source": "companyInfo",
+      "field": "state",
+      "required": true,
+      "formatter": "uppercase"
+    },
+    {
+      "name": "MERCHANT_CODE",
+      "source": "random",
+      "required": true,
+      "options": [
+        "5533",
+        "7538",
+        "7997"
+      ]
+    },
+    {
+      "name": "CARD_LAST4",
+      "source": "card",
+      "required": true
+    }
+  ],
+  "example": "CHECKCARD 0813 NAPA CA CKCD 7997 XXXXXXXXXXXX9017 9017"
+}

@@ -1,0 +1,48 @@
+{
+  "type": "WIRE_INCOMING",
+  "category": "wire_incoming",
+  "method": "WIRE",
+  "description": "Входящие wire-переводы",
+  "templateString": "Wire Transfer {DATE} {TIME} {BANK_NAME} {SENDER} Ref:{REF}",
+  "placeholders": [
+    {
+      "name": "DATE",
+      "source": "date",
+      "format": "MM/DD/YYYY",
+      "required": true
+    },
+    {
+      "name": "TIME",
+      "source": "date",
+      "format": "HH:mm",
+      "required": true
+    },
+    {
+      "name": "BANK_NAME",
+      "source": "random",
+      "required": true,
+      "options": [
+        "WELLS FARGO",
+        "CHASE",
+        "BANK OF AMERICA",
+        "CITIBANK"
+      ],
+      "formatter": "uppercase"
+    },
+    {
+      "name": "SENDER",
+      "source": "contractor",
+      "required": true,
+      "maxLength": 25,
+      "formatter": "uppercase"
+    },
+    {
+      "name": "REF",
+      "source": "generated",
+      "generatorType": "numericId",
+      "length": 12,
+      "required": true
+    }
+  ],
+  "example": "Wire Transfer 01/20/2025 14:30 WELLS FARGO ACME CORP Ref:112233445566"
+}

@@ -1,0 +1,43 @@
+{
+  "type": "CHASSIS_RENTAL",
+  "category": "chassis_rental",
+  "method": "ACH",
+  "description": "Аренда шасси с расчетом",
+  "templateString": "CCD DEBIT {CONTRACTOR} CHASSIS USAGE {CALCULATION} ID:{PMT_ID} INDN:{COMPANY_NAME}",
+  "placeholders": [
+    {
+      "name": "CONTRACTOR",
+      "source": "contractor",
+      "required": true,
+      "maxLength": 25,
+      "formatter": "uppercase",
+      "defaultOptions": [
+        "TRITON INTL",
+        "DCLI",
+        "FLEXLEASE"
+      ]
+    },
+    {
+      "name": "CALCULATION",
+      "source": "calculation",
+      "required": true,
+      "format": "{quantity} {unit} @ ${rate}"
+    },
+    {
+      "name": "PMT_ID",
+      "source": "generated",
+      "generatorType": "pmtId",
+      "length": 6,
+      "required": true
+    },
+    {
+      "name": "COMPANY_NAME",
+      "source": "companyInfo",
+      "field": "companyName",
+      "required": true,
+      "maxLength": 40,
+      "formatter": "uppercase"
+    }
+  ],
+  "example": "CCD DEBIT TRITON INTL CHASSIS USAGE 36 HR @ $4.10 ID:551234 INDN:SRB AUTOS LLC"
+}

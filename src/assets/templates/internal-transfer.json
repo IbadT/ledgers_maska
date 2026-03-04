@@ -1,0 +1,44 @@
+{
+  "type": "INTERNAL_TRANSFER",
+  "category": "internal_transfer",
+  "method": "INTERNAL",
+  "description": "Внутренние переводы между счетами",
+  "templateString": "Online Banking transfer {DIRECTION} {ACCOUNT_TYPE} {ACCOUNT_LAST4} Confirmation# {CONFIRM}",
+  "placeholders": [
+    {
+      "name": "DIRECTION",
+      "source": "transaction",
+      "field": "amount",
+      "transform": "direction",
+      "required": true,
+      "mapping": {
+        "positive": "from",
+        "negative": "to"
+      }
+    },
+    {
+      "name": "ACCOUNT_TYPE",
+      "source": "random",
+      "required": true,
+      "options": [
+        "CHK",
+        "SAV"
+      ]
+    },
+    {
+      "name": "ACCOUNT_LAST4",
+      "source": "companyInfo",
+      "field": "accountNumber",
+      "required": true,
+      "fallback": "1234"
+    },
+    {
+      "name": "CONFIRM",
+      "source": "generated",
+      "generatorType": "confirm",
+      "length": 10,
+      "required": true
+    }
+  ],
+  "example": "Online Banking transfer to SAV 1234 Confirmation# 9501732841"
+}

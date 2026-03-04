@@ -1,0 +1,47 @@
+{
+  "type": "CHECKCARD_GENERIC",
+  "category": "card_checkcard",
+  "method": "CHECKCARD",
+  "description": "Универсальный CHECKCARD для неизвестных категорий",
+  "templateString": "CHECKCARD {DATE} {MERCHANT} {CITY} {STATE} CKCD {CODE} XXXXXXXXXXXX{CARD_LAST4} {CARD_LAST4}",
+  "placeholders": [
+    {
+      "name": "DATE",
+      "source": "date",
+      "format": "MMDD",
+      "required": true
+    },
+    {
+      "name": "MERCHANT",
+      "source": "contractor",
+      "required": true,
+      "maxLength": 25,
+      "formatter": "uppercase"
+    },
+    {
+      "name": "CITY",
+      "source": "random",
+      "required": true,
+      "maxLength": 20,
+      "formatter": "uppercase"
+    },
+    {
+      "name": "STATE",
+      "source": "companyInfo",
+      "field": "state",
+      "required": true,
+      "formatter": "uppercase"
+    },
+    {
+      "name": "CODE",
+      "source": "random",
+      "required": true,
+      "options": ["0000", "1111", "9999"]
+    },
+    {
+      "name": "CARD_LAST4",
+      "source": "card",
+      "required": true
+    }
+  ]
+}
