@@ -2,13 +2,13 @@
   "semi": true,
   "trailingComma": "all",
   "singleQuote": true,
-  "printWidth": 100,
+  "printWidth": 120,
   "tabWidth": 2,
   "useTabs": false,
   "quoteProps": "as-needed",
   "bracketSpacing": true,
   "bracketSameLine": false,
-  "arrowParens": "avoid",
+  "arrowParens": "always",
   "endOfLine": "lf",
   "embeddedLanguageFormatting": "auto",
   "insertPragma": false,
@@ -20,7 +20,8 @@
     {
       "files": "*.json",
       "options": {
-        "printWidth": 80
+        "printWidth": 80,
+        "tabWidth": 2
       }
     },
     {
@@ -28,6 +29,19 @@
       "options": {
         "printWidth": 80,
         "proseWrap": "always"
+      }
+    },
+    {
+      "files": "*.tsx",
+      "options": {
+        "printWidth": 100
+      }
+    },
+    {
+      "files": "*.html",
+      "options": {
+        "printWidth": 120,
+        "tabWidth": 2
       }
     }
   ]

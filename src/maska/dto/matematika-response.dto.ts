@@ -1,160 +1,273 @@
-import { IsDate, IsDateString, IsNotEmpty, IsNumber, IsPositive, IsString } from "class-validator";
+// ==========================================
+// src/maska/dto/matematika-response.dto.ts
+// ==========================================
 
+import {
+  IsArray,
+  IsDateString,
+  IsNotEmpty,
+  IsNumber,
+  IsPositive,
+  IsString,
+  ValidateNested,
+  Matches,
+  MaxLength,
+} from 'class-validator';
+import { Type } from 'class-transformer';
 
 export class MaskaResponseDto {
-    transactions: TransactionResponseDto[];
+  @ValidateNested()
+  @Type(() => FinancialSummaryDto)
+  financialSummary: FinancialSummaryDto;
+
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => MaskedTransactionDto)
+  transactions: MaskedTransactionDto[];
+
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => DailyClosingBalanceDto)
+  dailyClosingBalances: DailyClosingBalanceDto[];
+
+  @IsString()
+  @IsNotEmpty()
+  @IsDateString()
+  generatedAt: string;
+
+  constructor(
+    financialSummary: FinancialSummaryDto,
+    transactions: MaskedTransactionDto[],
+    dailyClosingBalances: DailyClosingBalanceDto[],
+    generatedAt: string,
+  ) {
+    this.financialSummary = financialSummary;
+    this.transactions = transactions;
+    this.dailyClosingBalances = dailyClosingBalances;
+    this.generatedAt = generatedAt;
+  }
 }
 
-export class TransactionResponseDto {
+export class MaskedTransactionDto {
+  @IsString()
+  @IsNotEmpty()
+  @IsDateString()
+  transactionDate: string; // ISO 8601 сохраняем
 
-    @IsString()
-    @IsNotEmpty()
-    @IsDate()
-    transactionDate: string;
+  @IsString()
+  @IsNotEmpty()
+  @Matches(/^\d{4}-\d{2}-\d{2}$/)
+  postingDate: string; // YYYY-MM-DD строго!
 
-    @IsString()
-    @IsNotEmpty()
-    @IsDateString()
-    postingDate: string;
+  @IsString()
+  @IsNotEmpty()
+  @MaxLength(100)
+  description: string; // Сформированное мемо
 
-    @IsString()
-    @IsNotEmpty()
-    description: string;
+  @IsNumber()
+  amount: number;
 
-    @IsNumber()
-    @IsNotEmpty()
-    amount: number;
+  @IsNumber()
+  balanceAfter: number;
 
-    @IsNumber()
-    @IsNotEmpty()
-    balanceAfter: number;
-};
-
-export class FindncialSummaryResponse {
-    companyName: string;
-    accountNumber: string;
-    period: string;
-    initialBalance: number;
-    finalBalance: number;
-
-    totals: TotalResponse;
-
-    revenueBreakdown: RevenueBreakdownResponse;
-
-    expensesBreakdown: ExpensesBreakdownResponse;
-
-    transactionCount: TransactionCountResponse;
-
-    dailyClosingBalances: DailyClosingBalancesResponse;
+  constructor(transactionDate: string, postingDate: string, description: string, amount: number, balanceAfter: number) {
+    this.transactionDate = transactionDate;
+    this.postingDate = postingDate;
+    this.description = description;
+    this.amount = amount;
+    this.balanceAfter = balanceAfter;
+  }
 }
 
+export class FinancialSummaryDto {
+  @IsString()
+  @IsNotEmpty()
+  companyName: string;
 
-export class TotalResponse {
-    @IsNumber()
-    @IsNotEmpty()
-    totalRevenue: number;
-    
-    @IsNumber()
-    @IsNotEmpty()
-    totalExpenses: number;
-    
-    @IsNumber()
-    @IsNotEmpty()
-    netProfit: number;
+  @IsString()
+  @IsNotEmpty()
+  accountNumber: string; // Последние 4 цифры
+
+  @IsString()
+  @IsNotEmpty()
+  period: string; // "2026-03-01 - 2026-03-31"
+
+  @IsNumber()
+  initialBalance: number;
+
+  @IsNumber()
+  finalBalance: number;
+
+  @ValidateNested()
+  @Type(() => TotalDto)
+  totals: TotalDto;
+
+  @ValidateNested()
+  @Type(() => RevenueBreakdownDto)
+  revenueBreakdown: RevenueBreakdownDto;
+
+  @ValidateNested()
+  @Type(() => ExpensesBreakdownDto)
+  expensesBreakdown: ExpensesBreakdownDto;
+
+  @ValidateNested()
+  @Type(() => TransactionCountDto)
+  transactionCount: TransactionCountDto;
+
+  constructor(
+    companyName: string,
+    accountNumber: string,
+    period: string,
+    initialBalance: number,
+    finalBalance: number,
+    totals: TotalDto,
+    revenueBreakdown: RevenueBreakdownDto,
+    expensesBreakdown: ExpensesBreakdownDto,
+    transactionCount: TransactionCountDto,
+  ) {
+    this.companyName = companyName;
+    this.accountNumber = accountNumber;
+    this.period = period;
+    this.initialBalance = initialBalance;
+    this.finalBalance = finalBalance;
+    this.totals = totals;
+    this.revenueBreakdown = revenueBreakdown;
+    this.expensesBreakdown = expensesBreakdown;
+    this.transactionCount = transactionCount;
+  }
 }
 
-export class RevenueBreakdownResponse {
-    @IsNumber()
-    @IsNotEmpty()
-    totalAch: number;
-    
-    @IsNumber()
-    @IsNotEmpty()
-    totalWire: number;
-    
-    @IsNumber()
-    @IsNotEmpty()
-    totalZelle: number;
-    
-    @IsNumber()
-    @IsNotEmpty()
-    totalGateway: number;
-    
-    @IsNumber()
-    @IsNotEmpty()
-    totalOther: number;
+export class TotalDto {
+  @IsNumber()
+  totalRevenue: number;
+
+  @IsNumber()
+  totalExpenses: number;
+
+  @IsNumber()
+  netProfit: number;
+
+  constructor(totalRevenue: number, totalExpenses: number, netProfit: number) {
+    this.totalRevenue = totalRevenue;
+    this.totalExpenses = totalExpenses;
+    this.netProfit = netProfit;
+  }
 }
 
-export class ExpensesBreakdownResponse {
-    @IsNumber()
-    @IsNotEmpty()
-    byCard: number;
-    
-    @IsNumber()
-    @IsNotEmpty()
-    byAccount: number;
-    
-    @IsNumber()
-    @IsNotEmpty()
-    byOther: number;
+export class RevenueBreakdownDto {
+  @IsNumber()
+  totalAch: number;
+
+  @IsNumber()
+  totalWire: number;
+
+  @IsNumber()
+  totalZelle: number;
+
+  @IsNumber()
+  totalGateway: number;
+
+  @IsNumber()
+  totalOther: number;
+
+  constructor(totalAch: number, totalWire: number, totalZelle: number, totalGateway: number, totalOther: number) {
+    this.totalAch = totalAch;
+    this.totalWire = totalWire;
+    this.totalZelle = totalZelle;
+    this.totalGateway = totalGateway;
+    this.totalOther = totalOther;
+  }
 }
 
-export class TransactionCountResponse {
-    @IsNumber()
-    @IsNotEmpty()
-    @IsPositive()
-    total: number;
-    
-    deposits: DepositsResponse;
-    withdrawals: WithdrawalsResponse;
+export class ExpensesBreakdownDto {
+  @IsNumber()
+  byCard: number;
+
+  @IsNumber()
+  byAccount: number;
+
+  constructor(byCard: number, byAccount: number) {
+    this.byCard = byCard;
+    this.byAccount = byAccount;
+  }
 }
 
-export class DepositsResponse {
-    @IsNumber()
-    @IsNotEmpty()
-    @IsPositive()
-    total: number;
-    
-    @IsNumber()
-    @IsNotEmpty()
-    @IsPositive()
-    ach: number;
-    
-    @IsNumber()
-    @IsNotEmpty()
-    @IsPositive()
-    wire: number;
-    
-    @IsNumber()
-    @IsNotEmpty()
-    @IsPositive()
-    zelle: number;
+export class TransactionCountDto {
+  @IsNumber()
+  @IsPositive()
+  total: number;
+
+  @ValidateNested()
+  @Type(() => DepositsDto)
+  deposits: DepositsDto;
+
+  @ValidateNested()
+  @Type(() => WithdrawalsDto)
+  withdrawals: WithdrawalsDto;
+
+  constructor(total: number, deposits: DepositsDto, withdrawals: WithdrawalsDto) {
+    this.total = total;
+    this.deposits = deposits;
+    this.withdrawals = withdrawals;
+  }
 }
 
-export class WithdrawalsResponse {
-    @IsNumber()
-    @IsNotEmpty()
-    @IsPositive()
-    total: number;
-    
-    @IsNumber()
-    @IsNotEmpty()
-    @IsPositive()
-    fromAccount: number;
-    
-    @IsNumber()
-    @IsNotEmpty()
-    @IsPositive()
-    byCard: number;
+export class DepositsDto {
+  @IsNumber()
+  @IsPositive()
+  total: number;
+
+  @IsNumber()
+  @IsPositive()
+  ach: number;
+
+  @IsNumber()
+  @IsPositive()
+  wire: number;
+
+  @IsNumber()
+  @IsPositive()
+  zelle: number;
+
+  constructor(total: number, ach: number, wire: number, zelle: number) {
+    this.total = total;
+    this.ach = ach;
+    this.wire = wire;
+    this.zelle = zelle;
+  }
 }
 
-export class DailyClosingBalancesResponse {
-    @IsString()
-    @IsNotEmpty()
-    @IsDateString()
-    date: string;
-    
-    @IsNumber()
-    @IsNotEmpty()
-    balance: number;
+export class WithdrawalsDto {
+  @IsNumber()
+  @IsPositive()
+  total: number;
+
+  @IsNumber()
+  @IsPositive()
+  fromAccount: number;
+
+  @IsNumber()
+  @IsPositive()
+  byCard: number;
+
+  constructor(total: number, fromAccount: number, byCard: number) {
+    this.total = total;
+    this.fromAccount = fromAccount;
+    this.byCard = byCard;
+  }
+}
+
+export class DailyClosingBalanceDto {
+  @IsString()
+  @IsNotEmpty()
+  @Matches(/^\d{4}-\d{2}-\d{2}$/)
+  date: string;
+
+  @IsNumber()
+  balance: number;
+
+  constructor(date: string, balance: number) {
+    this.date = date;
+    this.balance = balance;
+  }
 }

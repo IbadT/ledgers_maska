@@ -1,3 +1,281 @@
+ЗАПРОС ДЛЯ ТЕСТА
+{
+  "jobId": "comprehensive-test-001",
+  "generatedAt": "2026-03-06T12:00:00Z",
+  "dailyBalances": [
+    { "date": "2026-03-01", "balance": 100000 },
+    { "date": "2026-03-31", "balance": 98547.25 }
+  ],
+  "forwardingInfo": {
+    "companyName": "Srb Autos LLC",
+    "ownerName": "John Smith",
+    "state": "CA",
+    "associatedCard": "2091222000102910",
+    "customContractors": [
+      {
+        "type": "fuel",
+        "name": "LumNuft Inc"
+      },
+      {
+        "type": "bookkeeper",
+        "name": "Jackson Sam CPA"
+      }
+    ],
+    "customCustomers": ["Super LLC", "Lulu Inc.", "Mega Transport"]
+  },
+  "summary": {
+    "initialBalance": 100000,
+    "finalBalance": 98547.25,
+    "netProfit": -1452.75,
+    "totalExpenses": 3847.85,
+    "totalRevenue": 2395.10
+  },
+  "transactions": [
+    {
+      "transactionId": "550e8400-e29b-41d4-a716-446655440000",
+      "transactionDate": "2026-03-01T09:00:00Z",
+      "postingDate": "2026-03-01T00:00:00Z",
+      "amount": 500.00,
+      "balanceAfter": 100500.00,
+      "category": "Gateway Income",
+      "method": "ACH_DEBIT",
+      "isManual": false,
+      "type": "income"
+    },
+    {
+      "transactionId": "550e8400-e29b-41d4-a716-446655440001",
+      "transactionDate": "2026-03-02T10:00:00Z",
+      "postingDate": "2026-03-02T00:00:00Z",
+      "amount": -1250.00,
+      "balanceAfter": 99250.00,
+      "category": "Payroll",
+      "method": "ACH_DEBIT",
+      "isManual": false,
+      "type": "expense"
+    },
+    {
+      "transactionId": "550e8400-e29b-41d4-a716-446655440002",
+      "transactionDate": "2026-03-03T14:30:00Z",
+      "postingDate": "2026-03-03T00:00:00Z",
+      "amount": 1500.00,
+      "balanceAfter": 100750.00,
+      "category": "Wire",
+      "method": "WIRE",
+      "isManual": false,
+      "type": "income"
+    },
+    {
+      "transactionId": "550e8400-e29b-41d4-a716-446655440003",
+      "transactionDate": "2026-03-04T16:00:00Z",
+      "postingDate": "2026-03-04T00:00:00Z",
+      "amount": 250.00,
+      "balanceAfter": 101000.00,
+      "category": "Zelle",
+      "method": "ZELLE",
+      "isManual": false,
+      "type": "income"
+    },
+    {
+      "transactionId": "550e8400-e29b-41d4-a716-446655440004",
+      "transactionDate": "2026-03-05T11:00:00Z",
+      "postingDate": "2026-03-05T00:00:00Z",
+      "amount": 800.00,
+      "balanceAfter": 101800.00,
+      "category": "ACH Incoming",
+      "method": "ACH",
+      "isManual": false,
+      "type": "income"
+    },
+    {
+      "transactionId": "550e8400-e29b-41d4-a716-446655440005",
+      "transactionDate": "2026-03-06T12:00:00Z",
+      "postingDate": "2026-03-06T00:00:00Z",
+      "amount": -85.50,
+      "balanceAfter": 101714.50,
+      "category": "Fuel",
+      "method": "CHECKCARD",
+      "isManual": false,
+      "type": "expense"
+    },
+    {
+      "transactionId": "550e8400-e29b-41d4-a716-446655440006",
+      "transactionDate": "2026-03-07T08:00:00Z",
+      "postingDate": "2026-03-07T00:00:00Z",
+      "amount": -49.99,
+      "balanceAfter": 101664.51,
+      "category": "Software Subscription",
+      "method": "CHECKCARD",
+      "isManual": false,
+      "type": "expense"
+    },
+    {
+      "transactionId": "550e8400-e29b-41d4-a716-446655440007",
+      "transactionDate": "2026-03-08T15:30:00Z",
+      "postingDate": "2026-03-08T00:00:00Z",
+      "amount": -245.00,
+      "balanceAfter": 101419.51,
+      "category": "Parts",
+      "method": "CHECKCARD",
+      "isManual": false,
+      "type": "expense"
+    },
+    {
+      "transactionId": "550e8400-e29b-41d4-a716-446655440008",
+      "transactionDate": "2026-03-09T10:00:00Z",
+      "postingDate": "2026-03-09T00:00:00Z",
+      "amount": -89.99,
+      "balanceAfter": 101329.52,
+      "category": "Mobile Phone",
+      "method": "PURCHASE",
+      "isManual": false,
+      "type": "expense"
+    }
+  ]
+}
+
+
+
+
+
+
+
+
+
+
+РЕЗУЛЬТАТ
+{
+  "financialSummary": {
+    "companyName": "Srb Autos LLC",
+    "accountNumber": "2910",
+    "period": "2026-03-01 - 2026-03-31",
+    "initialBalance": 100000,
+    "finalBalance": 101329.52,
+    "totals": {
+      "totalRevenue": 3050,
+      "totalExpenses": 1720.48,
+      "netProfit": 1329.52
+    },
+    "revenueBreakdown": {
+      "totalAch": 0,
+      "totalWire": 1500,
+      "totalZelle": 250,
+      "totalGateway": 500,
+      "totalOther": 800
+    },
+    "expensesBreakdown": {
+      "byCard": 85.5,
+      "byAccount": 1634.98
+    },
+    "transactionCount": {
+      "total": 9,
+      "deposits": {
+        "total": 4,
+        "ach": 0,
+        "wire": 1,
+        "zelle": 1
+      },
+      "withdrawals": {
+        "total": 5,
+        "fromAccount": 4,
+        "byCard": 1
+      }
+    }
+  },
+  "transactions": [
+    {
+      "transactionDate": "2026-03-01T09:00:00Z",
+      "postingDate": "2026-03-01",
+      "description": "DWOLLA DES:DEPOSIT ID:087285172047884 INDN:SRB AUTOS LLC",
+      "amount": 500,
+      "balanceAfter": 100500
+    },
+    {
+      "transactionDate": "2026-03-02T10:00:00Z",
+      "postingDate": "2026-03-02",
+      "description": "PAYCHEX DES:PAYROLL ID:985499744187324 INDN:SRB AUTOS LLC PAYDATE 2026-03-02",
+      "amount": -1250,
+      "balanceAfter": 99250
+    },
+    {
+      "transactionDate": "2026-03-03T14:30:00Z",
+      "postingDate": "2026-03-03",
+      "description": "WIRE TRANSFER 2026-03-03 2026-03-03 WELLS FARGO BANK OF AMERICA REF:000000000000",
+      "amount": 1500,
+      "balanceAfter": 100750
+    },
+    {
+      "transactionDate": "2026-03-04T16:00:00Z",
+      "postingDate": "2026-03-04",
+      "description": "ZELLE TRANSFER CONF# 3151420150; JOHN SMITH, JOHN SMITH",
+      "amount": 250,
+      "balanceAfter": 101000
+    },
+    {
+      "transactionDate": "2026-03-05T11:00:00Z",
+      "postingDate": "2026-03-05",
+      "description": "TRANSACTION ID:024432080671230",
+      "amount": 800,
+      "balanceAfter": 101800
+    },
+    {
+      "transactionDate": "2026-03-06T12:00:00Z",
+      "postingDate": "2026-03-06",
+      "description": "CHECKCARD 2026-03-06 EXXONMOBIL RICHARDSON CA CKCD 5541 XXXXXXXXXXXX2910 2910",
+      "amount": -85.5,
+      "balanceAfter": 101714.5
+    },
+    {
+      "transactionDate": "2026-03-07T08:00:00Z",
+      "postingDate": "2026-03-07",
+      "description": "TRANSACTION ID:210718807118864",
+      "amount": -49.99,
+      "balanceAfter": 101664.51
+    },
+    {
+      "transactionDate": "2026-03-08T15:30:00Z",
+      "postingDate": "2026-03-08",
+      "description": "TRANSACTION ID:370382743174443",
+      "amount": -245,
+      "balanceAfter": 101419.51
+    },
+    {
+      "transactionDate": "2026-03-09T10:00:00Z",
+      "postingDate": "2026-03-09",
+      "description": "TRANSACTION ID:177241898476866",
+      "amount": -89.99,
+      "balanceAfter": 101329.52
+    }
+  ],
+  "dailyClosingBalances": [
+    {
+      "date": "2026-03-01",
+      "balance": 100000
+    },
+    {
+      "date": "2026-03-31",
+      "balance": 98547.25
+    }
+  ],
+  "generatedAt": "2026-03-06T02:04:36.496Z"
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 📋 ЭТАП 1: ИНИЦИАЛИЗАЦИЯ ПРОЕКТА (NestJS)
 1.1 Создание проекта
 bash

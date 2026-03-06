@@ -1,26 +1,166 @@
-import { IsArray, IsBoolean, IsDateString, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString, IsUUID } from "class-validator";
-import { PaymentMethod } from "src/shared/enums/transaction-category.enum";
+// ==========================================
+// src/maska/dto/matematika-payload.dto.ts
+// ==========================================
+
+import {
+  IsArray,
+  IsBoolean,
+  IsDateString,
+  IsEnum,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+  IsUUID,
+  ValidateNested,
+  Length,
+  MaxLength,
+  IsIn,
+} from 'class-validator';
+import { Type } from 'class-transformer';
+import { PaymentMethod, TransactionType } from '../../shared/enums/transaction-category.enum';
+
+// ВХОДНОЙ формат от Matematika (ваш формат)
+export class ForwardingInfoInputDto {
+  @IsString()
+  @IsNotEmpty()
+  @MaxLength(40)
+  companyName: string;
+
+  @IsString()
+  @IsNotEmpty()
+  ownerName: string;
+
+  @IsString()
+  @IsOptional()
+  @Length(2, 2)
+  state?: string; // ⚠️ ДОЛЖНО ПРИХОДИТЬ, иначе дефолт "CA"
+
+  @IsString()
+  @IsOptional()
+  @Length(4, 4)
+  accountNumber?: string;
+
+  @IsString()
+  @IsNotEmpty()
+  associatedCard: string; // Полный номер "2091222000102910"
+
+  // ⚠️ Ваш формат: массив объектов → трансформируем
+  @IsArray()
+  @IsOptional()
+  customContractors?: any[];
+
+  // ⚠️ Ваш формат: массив объектов → трансформируем
+  @IsArray()
+  @IsOptional()
+  customCustomers?: any[];
+
+  @IsOptional()
+  persistentContractors?: Record<string, string>;
+
+  constructor(
+    companyName: string,
+    ownerName: string,
+    associatedCard: string,
+    state?: string,
+    accountNumber?: string,
+    customContractors?: any[],
+    customCustomers?: any[],
+    persistentContractors?: Record<string, string>,
+  ) {
+    this.companyName = companyName;
+    this.ownerName = ownerName;
+    this.state = state;
+    this.accountNumber = accountNumber;
+    this.associatedCard = associatedCard;
+    this.customContractors = customContractors;
+    this.customCustomers = customCustomers;
+    this.persistentContractors = persistentContractors;
+  }
+}
+
+export class SummaryDto {
+  @IsNumber()
+  @IsNotEmpty()
+  finalBalance: number;
+
+  @IsNumber()
+  @IsNotEmpty()
+  initialBalance: number;
+
+  @IsNumber()
+  @IsNotEmpty()
+  netProfit: number;
+
+  @IsNumber()
+  @IsNotEmpty()
+  totalExpenses: number;
+
+  @IsNumber()
+  @IsNotEmpty()
+  totalRevenue: number;
+
+  constructor(
+    finalBalance: number,
+    initialBalance: number,
+    netProfit: number,
+    totalExpenses: number,
+    totalRevenue: number,
+  ) {
+    this.finalBalance = finalBalance;
+    this.initialBalance = initialBalance;
+    this.netProfit = netProfit;
+    this.totalExpenses = totalExpenses;
+    this.totalRevenue = totalRevenue;
+  }
+}
 
 export class MatematikaPayloadDto {
   @IsString()
   @IsNotEmpty()
   jobId: string;
-  
+
   @IsString()
   @IsNotEmpty()
+  @IsDateString()
   generatedAt: string;
-  
-  dailyBalances: DailyBalance[];
-  
-  forwardingInfo: ForwardingInfo;
-  
-  summary: Summary;
-  
+
   @IsArray()
-  transactions: Transaction[];
+  @ValidateNested({ each: true })
+  @Type(() => DailyBalanceDto)
+  dailyBalances: DailyBalanceDto[];
+
+  @ValidateNested()
+  @Type(() => ForwardingInfoInputDto)
+  forwardingInfo: ForwardingInfoInputDto;
+
+  @ValidateNested()
+  @Type(() => SummaryDto)
+  summary: SummaryDto;
+
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => TransactionInputDto)
+  transactions: TransactionInputDto[];
+
+  constructor(
+    jobId: string,
+    generatedAt: string,
+    dailyBalances: DailyBalanceDto[],
+    forwardingInfo: ForwardingInfoInputDto,
+    summary: SummaryDto,
+    transactions: TransactionInputDto[],
+  ) {
+    this.jobId = jobId;
+    this.generatedAt = generatedAt;
+    this.dailyBalances = dailyBalances;
+    this.forwardingInfo = forwardingInfo;
+    this.summary = summary;
+    this.transactions = transactions;
+  }
 }
 
-export class DailyBalance {
+export class DailyBalanceDto {
   @IsNumber()
   @IsNotEmpty()
   balance: number;
@@ -29,174 +169,115 @@ export class DailyBalance {
   @IsNotEmpty()
   @IsDateString()
   date: string;
+
+  constructor(balance: number, date: string) {
+    this.balance = balance;
+    this.date = date;
+  }
 }
 
-export class ForwardingInfo {
+export class CalculationDetailsDto {
+  @IsNumber()
+  quantity: number;
+
+  @IsNumber()
+  rate: number;
+
   @IsString()
-  @IsNotEmpty()
-  associatedCard: string;
-  
-  @IsString()
-  @IsNotEmpty()
-  companyName: string;
-  
-  @IsArray()
-  customContractors: CustomContractor[];
-  
-  @IsArray()
-  customCustomers: CustomCustomer[];
-  
-  @IsString()
-  @IsNotEmpty()
-  ownerName: string;
+  unit: string;
+
+  constructor(quantity: number, rate: number, unit: string) {
+    this.quantity = quantity;
+    this.rate = rate;
+    this.unit = unit;
+  }
 }
 
-export class CustomContractor {
-  @IsString()
+export class TransactionInputDto {
+  @IsUUID()
   @IsNotEmpty()
-  name: string;
-  
-  // TODO: возможно это enum
-  @IsString()
-  @IsNotEmpty()
-  transactionType: string;
-}
+  transactionId: string;
 
-export class CustomCustomer {
   @IsString()
   @IsNotEmpty()
-  category: string;
-  
+  @IsDateString()
+  transactionDate: string;
+
   @IsString()
   @IsNotEmpty()
-  name: string;
-}
+  @IsDateString()
+  postingDate: string; // "2026-03-09T00:00:00Z" → трансформируем
 
-export class Summary {
-  @IsNumber()
-  @IsNotEmpty()
-  finalBalance: number;
-  
-  @IsNumber()
-  @IsNotEmpty()
-  initialBalance: number;
-  
-  @IsNumber()
-  @IsNotEmpty()
-  netProfit: number;
-  
-  @IsNumber()
-  @IsNotEmpty()
-  totalExpenses: number;
-  
-  @IsNumber()
-  @IsNotEmpty()
-  totalRevenue: number;
-}
-
-export class Transaction {
   @IsNumber()
   @IsNotEmpty()
   amount: number;
-  
+
   @IsNumber()
   @IsNotEmpty()
   balanceAfter: number;
-  
+
   @IsString()
   @IsNotEmpty()
   category: string;
-  
+
+  @IsEnum(PaymentMethod)
+  @IsNotEmpty()
+  method: PaymentMethod;
+
   @IsBoolean()
   @IsNotEmpty()
   isManual: boolean;
-  
+
   @IsString()
   @IsNotEmpty()
-  @IsEnum(PaymentMethod)
-  method: string;
-  
-  @IsString()
-  @IsNotEmpty()
-  postingDate: string; // 2026-03-01T00:00:00Z
-  
-  @IsString()
-  @IsNotEmpty()
-  transactionDate: string; // 2026-03-01T14:50:00Z
-  
-  @IsString()
-  @IsNotEmpty()
-  @IsUUID()
-  transactionId: string; // bf60727a-258a-4eb1-9e66-e4643db7fde0
-  
-  @IsString()
-  @IsNotEmpty()
-  type: string;
+  // @IsIn(['income', 'expense'])
+  @IsIn(Object.values(TransactionType))
+  type: TransactionType;
+
+  @IsNumber()
+  @IsOptional()
+  contractorIndex?: number;
 
   @IsBoolean()
   @IsOptional()
-  FixAsFirst?: boolean // TODO: добавить после анализа matematika
-}
+  FixAsFirst?: boolean;
 
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => CalculationDetailsDto)
+  calculationDetails?: CalculationDetailsDto;
 
+  @IsString()
+  @IsOptional()
+  associatedCard?: string;
 
-
-
-// ====================
-// src/modules/maska/interfaces/maska-input.interface.ts
-
-// export interface MaskaInputDto {
-//   transactions: TransactionInput[];
-//   forwardingInfo: ForwardingInfo;
-//   dailyBalances?: DailyBalance[];      // Опционально, для справки
-//   summary?: MonthSummary;              // Опционально, для справки
-// }
-
-// export interface TransactionInput {
-//   transactionId: string;
-//   transactionDate: string;             // ISO 8601
-//   postingDate: string;                 // YYYY-MM-DD
-//   amount: number;
-//   balanceAfter: number;
-//   category: TransactionCategory;       // Техническая категория
-//   method: PaymentMethod;               // Способ платежа
-//   isManual: boolean;
-//   contractorIndex?: number;            // Индекс для выбора контрагента
-//   associatedCard?: string;             // Последние 4 цифры или полный номер
-//   calculationDetails?: CalculationDetails; // Для аренды шасси и т.п.
-//   FixAsFirst?: boolean;                // Для сортировки
-// }
-
-// export interface ForwardingInfo {
-//   companyInfo: CompanyInfo;
-//   customCustomers?: string[];          // Пользовательские клиенты (доходы)
-//   customContractors?: Record<string, string[]>; // Категория → подрядчики
-//   persistentContractors?: Record<string, string>; // "Зелёные" контрагенты
-//   cards?: string[];                    // Последние 4 цифры карт
-// }
-
-export interface CompanyInfo {
-  companyName: string;                 // INDN в шаблонах (max 40 симв.)
-  ownerName?: string;                  // Для Zelle и подписей
-  state: string;                       // CA, TX и т.д. — для выбора CSV
-  accountNumber?: string;              // Для внутренних переводов (последние 4)
-}
-
-export interface CalculationDetails {
-  quantity: number;
-  rate: number;
-  unit: string;                        // HR, LB, MI и т.д.
-}
-
-// export interface DailyBalance {
-//   date: string;                        // YYYY-MM-DD
-//   balance: number;
-// }
-
-export interface MonthSummary {
-  initialBalance: number;
-  finalBalance: number;
-  totalRevenue: number;
-  totalExpenses: number;
-  netProfit: number;
+  constructor(
+    transactionId: string,
+    transactionDate: string,
+    postingDate: string,
+    amount: number,
+    balanceAfter: number,
+    category: string,
+    method: PaymentMethod,
+    isManual: boolean,
+    type: TransactionType,
+    contractorIndex?: number,
+    fixAsFirst?: boolean,
+    calculationDetails?: CalculationDetailsDto,
+    associatedCard?: string,
+  ) {
+    this.transactionId = transactionId;
+    this.transactionDate = transactionDate;
+    this.postingDate = postingDate;
+    this.amount = amount;
+    this.balanceAfter = balanceAfter;
+    this.category = category;
+    this.method = method;
+    this.isManual = isManual;
+    this.type = type;
+    this.contractorIndex = contractorIndex;
+    this.FixAsFirst = fixAsFirst;
+    this.calculationDetails = calculationDetails;
+    this.associatedCard = associatedCard;
+  }
 }
