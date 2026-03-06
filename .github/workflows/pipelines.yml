@@ -1,34 +1,40 @@
 name: CI-CD pipeline
 
 on:
-    push:
-        branches:
-            - main
-            - dev
-    pull_request:
-        branches:
-            - main
-            - dev
+  push:
+    branches:
+      - main
+      - dev
+  pull_request:
+    branches:
+      - main
+      - dev
 
 jobs:
-    build:
-        runs-on: ubuntu-latest
-        name: setup, builds
-        steps:
-            - name: Checkout
-              uses: actions/checkout@4
+  build:
+    runs-on: ubuntu-latest
+    name: Test and Build
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
 
-            - name: Setup Node.JS
-              uses: actions/setup-node@4
-              with:
-                node-version: '24'
-                cache: 'npm'
-            
-            - name: Install dependencies
-              run: npm ci
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'npm'
 
-            - name: testing application
-              run: npm run test
-            
-            - name: build application
-              run: npm run build
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Check code formatting
+        run: npm run format:check
+
+    #   - name: Run linting
+    #     run: npm run lint:check
+
+      - name: Run tests
+        run: npm run test
+
+      - name: Build application
+        run: npm run build
