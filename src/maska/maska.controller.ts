@@ -5,7 +5,6 @@ import { MaskaService } from './maska.service';
 import { MatematikaPayloadDto } from './dto/matematika-payload.dto';
 import { MaskaResponseDto } from './dto/matematika-response.dto';
 
-
 @Controller()
 export class MaskaController {
   private readonly logger = new Logger(MaskaController.name);
