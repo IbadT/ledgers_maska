@@ -1,0 +1,9 @@
+{
+  "type": "ATM_DEPOSIT",
+  "category": "atm_deposit",
+  "method": "ACH",
+  "description": "ATM снятие с новым &синтаксисом",
+  "templateString": "BKOFAMERICA ATM &DAT{MM/DD} #&ATMID DEPOSIT &MERCHTNAME &MERCHADDYSTATECODE",
+  "placeholders": [],
+  "example": "BKOFAMERICA ATM 08/01 #000009848 DEPOSIT MODESTO CA"
+}

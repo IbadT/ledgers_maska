@@ -1,0 +1,9 @@
+{
+  "type": "PURCHASE_MOBILE",
+  "category": "mobile_payment",
+  "method": "PURCHASE",
+  "description": "Мобильная связь с новым &синтаксисом",
+  "templateString": "PURCHASE &DAT{MMDD} &MERCHTNAME WEB PAYM &ATTCHPHONENUMBER &MERCHADDYSTATECODE",
+  "placeholders": [],
+  "example": "PURCHASE 0812 T-MOBILE WEB PAYM 877-453-1304 WA"
+}

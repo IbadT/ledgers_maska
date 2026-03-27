@@ -5,10 +5,11 @@ import { MaskaController } from './maska/maska.controller';
 import { MaskaService } from './maska/maska.service';
 import { GeneratorsService } from './generators/generators.service';
 import { ContractorsService } from './contractors/contractors.service';
-import { TemplatesService } from './templates/templates.service';
+import { TemplatesModule } from './templates/templates.module';
 
 @Module({
   imports: [
+    TemplatesModule,
     ClientsModule.register([
       {
         name: 'MATHEMATIKA_SERVICE',
@@ -26,6 +27,6 @@ import { TemplatesService } from './templates/templates.service';
     ]),
   ],
   controllers: [AppController, MaskaController],
-  providers: [MaskaService, GeneratorsService, ContractorsService, TemplatesService],
+  providers: [MaskaService, GeneratorsService, ContractorsService],
 })
 export class AppModule {}

@@ -1,0 +1,30 @@
+{
+  "type": "PAYROLL_CASE_EXAMPLES",
+  "category": "payroll",
+  "method": "ACH",
+  "description": "Примеры регистрозависимого форматирования для payroll",
+  "templateString": "PAYCHEX DES:PAYROLL ID:&NUMUP{985[1-9]{12}} INDN:&PERNAM PAYDATE &DAT{YYYY-MM-DD}",
+  "placeholders": [],
+  "examples": [
+    {
+      "template": "PAYCHEX DES:PAYROLL ID:&NUMUP{985[1-9]{12}} INDN:&PERNAM PAYDATE &DAT{YYYY-MM-DD}",
+      "description": "PERNAM -> UPPERCASE",
+      "result": "PAYCHEX DES:PAYROLL ID:985499744187324 INDN:SRB AUTOS LLC PAYDATE 2026-03-02"
+    },
+    {
+      "template": "PAYCHEX DES:PAYROLL ID:&NUMUP{985[1-9]{12}} INDN:&PerNam PAYDATE &DAT{YYYY-MM-DD}",
+      "description": "PerNam -> Title Case",
+      "result": "PAYCHEX DES:PAYROLL ID:985499744187324 INDN:Srb Autos Llc PAYDATE 2026-03-02"
+    },
+    {
+      "template": "PAYCHEX DES:PAYROLL ID:&NUMUP{985[1-9]{12}} INDN:&pernam PAYDATE &DAT{YYYY-MM-DD}",
+      "description": "pernam -> lowercase",
+      "result": "PAYCHEX DES:PAYROLL ID:985499744187324 INDN:srb autos llc PAYDATE 2026-03-02"
+    },
+    {
+      "template": "PAYCHEX DES:PAYROLL ID:&NUMUP{985[1-9]{12}} INDN:&PERNAMasis PAYDATE &DAT{YYYY-MM-DD}",
+      "description": "PERNAMasis -> as is",
+      "result": "PAYCHEX DES:PAYROLL ID:985499744187324 INDN:SRB AUtos llC PAYDATE 2026-03-02"
+    }
+  ]
+}

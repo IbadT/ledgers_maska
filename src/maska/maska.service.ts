@@ -279,6 +279,47 @@ export class MaskaService {
       data.gateway = ctx.randomCache.get(cacheKey);
     }
 
+    // Fuel/Card - получаем данные мерчанта
+    if (mapping?.technicalCategory === 'card_fuel') {
+      const cacheKey = 'merchant_data';
+      if (!ctx.randomCache.has(cacheKey)) {
+        const merchantData = this.contractorsService.getMerchantData('card_fuel', ctx.companyInfo.state);
+        if (merchantData) {
+          data.merchantName = merchantData.name;
+          data.stateCode = merchantData.state;
+          this.logger.debug(`Selected merchant: ${merchantData.name}, ${merchantData.state}`);
+        } else {
+          data.merchantName = 'UNKNOWN';
+          data.stateCode = ctx.companyInfo.state || 'CA';
+        }
+        ctx.randomCache.set(cacheKey, { merchantName: data.merchantName, stateCode: data.stateCode });
+      } else {
+        const cached = ctx.randomCache.get(cacheKey);
+        if (cached) {
+          data.merchantName = cached.merchantName;
+          data.stateCode = cached.stateCode;
+        }
+      }
+    }
+
+    // ATM Deposit - получаем город и генерируем ATM ID
+    if (mapping?.technicalCategory === 'atm_deposit') {
+      const cacheKey = 'atm_data';
+      if (!ctx.randomCache.has(cacheKey)) {
+        const city = this.contractorsService.getRandomFromCsv('atm_cities');
+        const atmId = this.generatorService.generateAtmId();
+        ctx.randomCache.set(cacheKey, { city, atmId });
+        this.logger.debug(`Selected ATM city: ${city}, ATM ID: ${atmId}`);
+      }
+      const cached = ctx.randomCache.get(cacheKey);
+      if (cached) {
+        data.merchantName = cached.city; // Используем merchantName для города
+        data.stateCode = ctx.companyInfo.state || 'CA';
+        // Добавим ATM ID в данные для шаблона
+        (data as any).atmId = cached.atmId;
+      }
+    }
+
     // Payroll
     if (mapping?.technicalCategory === 'payroll') {
       if (!data.contractor) {
@@ -286,6 +327,57 @@ export class MaskaService {
         data.contractor = 'ADP';
       }
       data.paydate = this.formatPaydate(data.date);
+    }
+
+    // Mobile Payment
+    if (mapping?.technicalCategory === 'mobile_payment') {
+      const cacheKey = 'mobile_operator';
+      if (!ctx.randomCache.has(cacheKey)) {
+        const mobileOperator = this.contractorsService.getRandomFromCsv('mobile_operators');
+        const phoneNumber = this.generatorService.generatePhoneNumber();
+        ctx.randomCache.set(cacheKey, { operator: mobileOperator, phone: phoneNumber });
+        this.logger.debug(`Selected mobile operator: ${mobileOperator}, phone: ${phoneNumber}`);
+      }
+      const cached = ctx.randomCache.get(cacheKey);
+      if (cached) {
+        data.merchantName = cached.operator;
+        (data as any).phoneNumber = cached.phone;
+      }
+      data.stateCode = ctx.companyInfo.state || 'CA';
+    }
+
+    // Utility Payment
+    if (mapping?.technicalCategory === 'utility_payment') {
+      const cacheKey = 'utility_provider';
+      if (!ctx.randomCache.has(cacheKey)) {
+        const utilityProvider = this.contractorsService.getRandomFromCsv('utilities');
+        ctx.randomCache.set(cacheKey, utilityProvider);
+        this.logger.debug(`Selected utility provider: ${utilityProvider}`);
+      }
+      data.merchantName = ctx.randomCache.get(cacheKey);
+      data.stateCode = ctx.companyInfo.state || 'CA';
+    }
+
+    // Insurance Payment
+    if (mapping?.technicalCategory === 'insurance_payment') {
+      const cacheKey = 'insurance_provider';
+      if (!ctx.randomCache.has(cacheKey)) {
+        const insuranceProvider = this.contractorsService.getRandomFromCsv('insurance');
+        ctx.randomCache.set(cacheKey, insuranceProvider);
+        this.logger.debug(`Selected insurance provider: ${insuranceProvider}`);
+      }
+      data.merchantName = ctx.randomCache.get(cacheKey);
+    }
+
+    // Marketing Payment
+    if (mapping?.technicalCategory === 'marketing_payment') {
+      const cacheKey = 'marketing_provider';
+      if (!ctx.randomCache.has(cacheKey)) {
+        const marketingProvider = this.contractorsService.getRandomFromCsv('marketing');
+        ctx.randomCache.set(cacheKey, marketingProvider);
+        this.logger.debug(`Selected marketing provider: ${marketingProvider}`);
+      }
+      data.merchantName = ctx.randomCache.get(cacheKey);
     }
 
     this.logger.debug(

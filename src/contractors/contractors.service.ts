@@ -95,14 +95,53 @@ export class ContractorsService {
     }
   }
 
+  /**
+   * Получает данные мерчанта из CSV
+   */
+  getMerchantData(category: string, state: string): { name: string; state: string; city?: string } | null {
+    const fileName = this.resolveCsvFileName(category, state);
+    const filePath = path.join(this.CSV_DIR, fileName);
+
+    try {
+      if (!fs.existsSync(filePath)) {
+        this.logger.warn(`⏭️  CSV not found: ${filePath}, using defaults`);
+        return null;
+      }
+
+      const content = fs.readFileSync(filePath, 'utf-8');
+      const lines = content.split('\n').filter((line) => line.trim());
+      
+      // Пропускаем заголовок и выбираем случайную строку
+      const dataLines = lines.slice(1);
+      if (dataLines.length === 0) return null;
+
+      const randomLine = dataLines[Math.floor(Math.random() * dataLines.length)];
+      const [name, stateCode, city] = randomLine.split(',').map(field => field.trim());
+
+      return {
+        name: name || 'UNKNOWN',
+        state: stateCode || state,
+        city: city
+      };
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      this.logger.error(`❌ Failed to load merchant data from ${fileName}: ${errorMessage}`);
+      return null;
+    }
+  }
+
   private resolveCsvFileName(category: string, state: string): string {
     const map: Record<string, string> = {
       gateway_deposit: 'gateways.csv',
       payroll: 'payroll_providers.csv',
-      card_fuel: `fleet_${state.toLowerCase()}.csv`,
+      card_fuel: `merchants_${state.toLowerCase()}.csv`,
       chassis_rental: 'chassis_providers.csv',
       atm_deposit: 'atm_cities.csv',
       wire_incoming: 'banks_wire.csv',
+      mobile_payment: 'mobile_operators.csv',
+      utility_payment: 'utilities.csv',
+      insurance_payment: 'insurance.csv',
+      marketing_payment: 'marketing.csv',
     };
 
     return map[category] || 'gateways.csv';
@@ -114,6 +153,10 @@ export class ContractorsService {
       payroll: ['ADP', 'PAYCHEX', 'GUSTO'],
       card_fuel: ['CHEVRON', 'SHELL', 'EXXONMOBIL', 'BP'],
       chassis_rental: ['TRITON INTL', 'DCLI', 'FLEXLEASE'],
+      mobile_payment: ['T-MOBILE', 'VERIZON', 'AT&T', 'SPRINT'],
+      utility_payment: ['DUKE ENERGY', 'PG&E', 'CON EDISON', 'SOUTHERN CALIFORNIA EDISON'],
+      insurance_payment: ['STATE FARM', 'GEICO', 'PROGRESSIVE', 'ALLSTATE'],
+      marketing_payment: ['FACEBOOK ADS', 'GOOGLE ADS', 'LINKEDIN ADS', 'TWITTER ADS'],
     };
 
     return defaults[category] || ['UNKNOWN'];

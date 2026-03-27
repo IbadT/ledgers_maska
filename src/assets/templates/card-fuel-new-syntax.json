@@ -1,0 +1,9 @@
+{
+  "type": "CARD_FUEL",
+  "category": "card_fuel",
+  "method": "CHECKCARD",
+  "description": "Оплата топлива картой с новым &синтаксисом",
+  "templateString": "CHECKCARD &DAT{YYYY-MM-DD} &MERCHTNAME &MERCHADDYSTATECODE CKCD 5541 XXXXXXXXXXXX&ATTCHCARDLAST4 &ATTCHCARDLAST4",
+  "placeholders": [],
+  "example": "CHECKCARD 2026-03-06 EXXONMOBIL RICHARDSON CA CKCD 5541 XXXXXXXXXXXX2910 2910"
+}

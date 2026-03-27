@@ -1,0 +1,9 @@
+{
+  "type": "PAYROLL",
+  "category": "payroll",
+  "method": "ACH",
+  "description": "Payroll с новым &синтаксисом - поддерживает регистрозависимость и последовательные номера",
+  "templateString": "PAYCHEX DES:PAYROLL ID:&NUMUP{985[1-9]{12}} INDN:&PERNAM PAYDATE &DAT{YYYY-MM-DD}",
+  "placeholders": [],
+  "example": "PAYCHEX DES:PAYROLL ID:985499744187324 INDN:SRB AUTOS LLC PAYDATE 2026-03-02"
+}

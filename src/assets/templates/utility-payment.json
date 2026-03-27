@@ -1,0 +1,9 @@
+{
+  "type": "PURCHASE_UTILITY",
+  "category": "utility_payment",
+  "method": "PURCHASE",
+  "description": "Коммунальные платежи с новым &синтаксисом",
+  "templateString": "PURCHASE &DAT{MMDD} &MERCHTNAME WEB PAY &ATTCHCARDLAST4 &MERCHADDYSTATECODE",
+  "placeholders": [],
+  "example": "PURCHASE 0819 DUKE ENERGY WEB PAY 2910 OH"
+}

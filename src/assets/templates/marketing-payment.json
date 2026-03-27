@@ -1,0 +1,9 @@
+{
+  "type": "ACH_MARKETING",
+  "category": "marketing_payment",
+  "method": "ACH",
+  "description": "Маркетинговые платежи с новым &синтаксисом",
+  "templateString": "&MERCHTNAME DES:ACH PMT ID:&NUMUP{200000000000} INDN:&PERNAM COID:&ATTCHCARDLAST4 WEB",
+  "placeholders": [],
+  "example": "FACEBOOK ADS DES:ACH PMT ID:200000000001 INDN:SRB AUTOS LLC COID:2910 WEB"
+}

@@ -6,8 +6,11 @@ import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import * as fs from 'fs';
 import * as path from 'path';
 import { PaymentMethod } from '../shared/enums/transaction-category.enum';
-import { PlaceholderSource, PlaceholderFormatter, Template, PlaceholderConfig } from './interfaces/template.interface';
+import { PlaceholderSource, PlaceholderFormatter, Template, PlaceholderConfig, MaskPattern } from './interfaces/template.interface';
 import { TemplateData } from 'src/maska/interfaces/template-data.interface';
+import { MaskPatternParserService } from './mask-pattern-parser.service';
+import { CaseFormatterService } from './case-formatter.service';
+import { SequentialGeneratorService } from '../generators/sequential-generator.service';
 
 @Injectable()
 export class TemplatesService implements OnModuleInit {
@@ -18,6 +21,12 @@ export class TemplatesService implements OnModuleInit {
   private readonly BASE_DIR = process.cwd();
   private readonly TEMPLATES_DIR = path.join(this.BASE_DIR, 'src', 'assets', 'templates');
   private readonly CSV_DIR = path.join(this.BASE_DIR, 'src', 'assets', 'csv');
+
+  constructor(
+    private readonly maskPatternParser: MaskPatternParserService,
+    private readonly caseFormatter: CaseFormatterService,
+    private readonly sequentialGenerator: SequentialGeneratorService,
+  ) {}
 
   async onModuleInit(): Promise<void> {
     this.logger.log('🔄 Loading templates...');
@@ -35,17 +44,26 @@ export class TemplatesService implements OnModuleInit {
     const templateFiles = [
       'gateway-deposit.json',
       'payroll.json',
+      'payroll-new-syntax.json',
+      'payroll-case-examples.json',
       'ach-incoming.json',
       'wire-incoming.json',
       'zelle.json',
       'atm-deposit.json',
+      'atm-deposit-new-syntax.json',
       'card-fuel.json',
+      'card-fuel-new-syntax.json',
+      'gasstation-checkcard.json',
       'card-subscription.json',
       'card-parts.json',
       'chassis-rental.json',
       'owner-transfer.json',
       'internal-transfer.json',
       'irs-payment.json',
+      'mobile-payment.json',
+      'utility-payment.json',
+      'insurance-payment.json',
+      'marketing-payment.json',
     ];
 
     let loaded = 0;
@@ -64,8 +82,11 @@ export class TemplatesService implements OnModuleInit {
         const content = fs.readFileSync(filePath, 'utf-8');
         const template: Template = JSON.parse(content);
 
-        // Ключ: category_method
-        const key = `${template.category}_${template.method}`;
+        // Ключ: category_method или category_method_new для новых шаблонов
+        const isNewSyntax = fileName.includes('-new');
+        const key = isNewSyntax 
+          ? `${template.category}_${template.method}_new`
+          : `${template.category}_${template.method}`;
         this.templates.set(key, template);
 
         this.logger.log(`✅ Loaded: ${fileName} → key: "${key}"`);
@@ -91,17 +112,35 @@ export class TemplatesService implements OnModuleInit {
   }
 
   getTemplate(category: string, method: PaymentMethod): Template {
-    const key = `${category}_${method}`;
-    const template = this.templates.get(key);
+    return this.getTemplateWithPreference(category, method);
+  }
 
-    if (!template) {
-      this.logger.error(`❌ Template NOT FOUND: "${key}"`);
-      this.logger.error(`   Available: ${Array.from(this.templates.keys()).join(', ')}`);
-      return this.getGenericTemplate();
+  /**
+   * Выбирает шаблон с приоритетом нового синтаксиса
+   * 1. Сначала ищет шаблон с новым &синтаксисом (суффикс _new)
+   * 2. Затем ищет обычный шаблон 
+   * 3. Возвращает generic если ничего не найдено
+   */
+  getTemplateWithPreference(category: string, method: PaymentMethod): Template {
+    const newKey = `${category}_${method}_new`;
+    const newTemplate = this.templates.get(newKey);
+    
+    if (newTemplate) {
+      this.logger.debug(`✅ Using NEW syntax template: "${newKey}"`);
+      return newTemplate;
     }
-
-    this.logger.debug(`✅ Found template: "${key}"`);
-    return template;
+    
+    const oldKey = `${category}_${method}`;
+    const oldTemplate = this.templates.get(oldKey);
+    
+    if (oldTemplate) {
+      this.logger.debug(`🔄 Using LEGACY syntax template: "${oldKey}"`);
+      return oldTemplate;
+    }
+    
+    this.logger.error(`❌ Template NOT FOUND: "${oldKey}" (tried new: "${newKey}")`);
+    this.logger.error(`   Available: ${Array.from(this.templates.keys()).join(', ')}`);
+    return this.getGenericTemplate();
   }
 
   // render(template: Template, data: Record<string, any>): string {
@@ -109,18 +148,121 @@ export class TemplatesService implements OnModuleInit {
     this.logger.debug(`🎨 Rendering template: ${template.type}`);
     this.logger.debug(`   Data keys: ${Object.keys(data).join(', ')}`);
 
-    let result = template.templateString;
-
-    for (const ph of template.placeholders) {
-      const rawValue = this.resolvePlaceholder(ph, data);
-      const formatted = this.applyFormatter(rawValue, ph.formatter);
-
-      this.logger.debug(`   {${ph.name}}: "${rawValue}" → "${formatted}"`);
-
-      result = result.replace(new RegExp(`\\{${ph.name}\\}`, 'g'), formatted);
+    // Проверяем, содержит ли шаблон &синтаксис
+    if (this.maskPatternParser.hasMaskSyntax(template.templateString)) {
+      return this.renderWithMaskSyntax(template.templateString, data);
     }
 
-    result = result.toUpperCase();
+    // Используем старую логику для обратной совместимости
+    return this.renderWithLegacySyntax(template, data);
+  }
+
+  /**
+   * Рендеринг с новым &синтаксисом
+   */
+  private renderWithMaskSyntax(templateString: string, data: TemplateData): string {
+    this.logger.debug(`🔥 Using new &syntax rendering`);
+    
+    const parsed = this.maskPatternParser.parseTemplate(templateString);
+    let result = '';
+
+    // Собираем результат из статических частей и паттернов
+    for (let i = 0; i < parsed.staticParts.length; i++) {
+      result += parsed.staticParts[i];
+      
+      if (i < parsed.patterns.length) {
+        const pattern = parsed.patterns[i];
+        const value = this.resolveMaskPattern(pattern, data);
+        result += value;
+      }
+    }
+
+    this.logger.debug(`   Result: "${result}"`);
+    return result;
+  }
+
+  /**
+   * Разрешает значение для паттерна &синтаксиса
+   */
+  private resolveMaskPattern(pattern: MaskPattern, data: TemplateData): string {
+    let rawValue = '';
+
+    this.logger.debug(`Resolving pattern: type=${pattern.type}, name=${pattern.name}, rules="${pattern.rules}"`);
+
+    switch (pattern.type) {
+      case 'sequential':
+        this.logger.debug(`Calling sequential generator with pattern: "${pattern.rules}"`);
+        rawValue = this.sequentialGenerator.generateSequential(
+          pattern.rules || '1',
+          `${pattern.name.toLowerCase()}_counter`
+        );
+        this.logger.debug(`Sequential generator returned: "${rawValue}"`);
+        break;
+
+      case 'company_name':
+        rawValue = data.companyInfo.companyName;
+        break;
+
+      case 'date':
+        rawValue = this.caseFormatter.formatDate(data.date, pattern.rules || 'MMDD');
+        break;
+
+      case 'merchant':
+        rawValue = data.merchantName || data.contractor || 'UNKNOWN';
+        break;
+
+      case 'state_code':
+        rawValue = data.stateCode || data.companyInfo.state || 'CA';
+        break;
+
+      case 'card_last4':
+        rawValue = data.cardLast4 || '0000';
+        break;
+
+      case 'phone_number':
+        rawValue = (data as any).phoneNumber || '000-000-0000';
+        break;
+
+      case 'atm_id':
+        rawValue = (data as any).atmId || '00000000';
+        break;
+
+      default:
+        rawValue = 'UNKNOWN';
+        break;
+    }
+
+    // Применяем регистрозависимое форматирование
+    const caseFormat = this.caseFormatter.determineCaseFormat(pattern.originalCase);
+    return this.caseFormatter.formatCase(rawValue, caseFormat, pattern.originalCase);
+  }
+
+  /**
+   * Рендеринг с устаревшим {синтаксисом} для обратной совместимости
+   */
+  private renderWithLegacySyntax(template: Template, data: TemplateData): string {
+    this.logger.debug(`🔄 Using legacy {} syntax rendering`);
+    
+    let result = template.templateString || '';
+
+    // Проверяем, что placeholders существует и является массивом
+    if (template.placeholders && Array.isArray(template.placeholders)) {
+      for (const ph of template.placeholders) {
+        const rawValue = this.resolvePlaceholder(ph, data);
+        const formatted = this.applyFormatter(rawValue, ph.formatter);
+
+        this.logger.debug(`   {${ph.name}}: "${rawValue}" → "${formatted}"`);
+
+        result = result.replace(new RegExp(`\\{${ph.name}\\}`, 'g'), formatted);
+      }
+    } else {
+      this.logger.warn(`Template ${template.type} has no placeholders array, using static content`);
+    }
+
+    // Применяем toUpperCase только если result не пустой
+    if (result) {
+      result = result.toUpperCase();
+    }
 
     if (template.maxLength && result.length > template.maxLength) {
       result = result.substring(0, template.maxLength);
@@ -201,13 +343,21 @@ export class TemplatesService implements OnModuleInit {
 
     switch (formatter) {
       case PlaceholderFormatter.UPPERCASE:
-        return value.toUpperCase();
+        return this.caseFormatter.formatCase(value, 'upper');
       case PlaceholderFormatter.TRUNCATE_30:
         return value.length > 30 ? value.substring(0, 30) : value;
       case PlaceholderFormatter.TRUNCATE_40:
         return value.length > 40 ? value.substring(0, 40) : value;
       case PlaceholderFormatter.LAST4:
         return value.slice(-4);
+      case PlaceholderFormatter.TITLE_CASE:
+        return this.caseFormatter.formatCase(value, 'title');
+      case PlaceholderFormatter.LOWERCASE:
+        return this.caseFormatter.formatCase(value, 'lower');
+      case PlaceholderFormatter.AS_IS:
+        return this.caseFormatter.formatCase(value, 'asis');
+      case PlaceholderFormatter.AUTO_CASE:
+        return this.caseFormatter.formatCase(value, 'auto');
       default:
         return value;
     }

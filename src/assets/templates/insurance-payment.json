@@ -1,0 +1,9 @@
+{
+  "type": "ACH_INSURANCE",
+  "category": "insurance_payment",
+  "method": "ACH",
+  "description": "Страховые платежи с новым &синтаксисом",
+  "templateString": "&MERCHTNAME DES:ACH PMT ID:&NUMUP{100000000000} INDN:&PERNAM COID:&ATTCHCARDLAST4 WEB",
+  "placeholders": [],
+  "example": "STATE FARM INS DES:ACH PMT ID:100000000001 INDN:SRB AUTOS LLC COID:2910 WEB"
+}

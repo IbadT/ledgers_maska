@@ -28,7 +28,13 @@ export const CATEGORY_MAP: Record<string, CategoryMapping> = {
     technicalCategory: 'card_fuel',
     templateType: 'CARD_FUEL',
     requiresContractor: true,
-    csvFile: 'fleet',
+    csvFile: 'merchants',
+  },
+  'Gas Station': {
+    technicalCategory: 'card_fuel',
+    templateType: 'GASSTATION_CHECKCARD',
+    requiresContractor: true,
+    csvFile: 'merchants',
   },
   'Chassis Rental': {
     technicalCategory: 'chassis_rental',
@@ -57,5 +63,29 @@ export const CATEGORY_MAP: Record<string, CategoryMapping> = {
     templateType: 'ATM_DEPOSIT',
     requiresContractor: false,
     csvFile: 'atm_cities',
+  },
+  'Mobile Payment': {
+    technicalCategory: 'mobile_payment',
+    templateType: 'PURCHASE_MOBILE',
+    requiresContractor: true,
+    csvFile: 'mobile_operators',
+  },
+  'Utility Payment': {
+    technicalCategory: 'utility_payment',
+    templateType: 'PURCHASE_UTILITY',
+    requiresContractor: true,
+    csvFile: 'utilities',
+  },
+  'Insurance Payment': {
+    technicalCategory: 'insurance_payment',
+    templateType: 'ACH_INSURANCE',
+    requiresContractor: true,
+    csvFile: 'insurance',
+  },
+  'Marketing Payment': {
+    technicalCategory: 'marketing_payment',
+    templateType: 'ACH_MARKETING',
+    requiresContractor: true,
+    csvFile: 'marketing',
   },
 };

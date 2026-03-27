@@ -1,0 +1,25 @@
+{
+  "type": "GASSTATION_CHECKCARD",
+  "category": "card_fuel",
+  "method": "CHECKCARD",
+  "description": "Оплата на АЗС с новым &синтаксисом",
+  "templateString": "CHECKCARD &DAT{YYYY-MM-DD} &MERCHTNAME &MERCHADDYSTATECODE CKCD &ATTCHCARDLAST4 XXXXXXXXXXXX&ATTCHCARDLAST4 &ATTCHCARDLAST4",
+  "placeholders": [],
+  "examples": [
+    {
+      "template": "CHECKCARD &DAT{YYYY-MM-DD} &MERCHTNAME &MERCHADDYSTATECODE CKCD &ATTCHCARDLAST4 XXXXXXXXXXXX&ATTCHCARDLAST4 &ATTCHCARDLAST4",
+      "description": "MERCHTNAME - UPPERCASE",
+      "result": "CHECKCARD 2026-03-06 EXXONMOBIL RICHARDSON CA CKCD 5541 XXXXXXXXXXXX2910 2910"
+    },
+    {
+      "template": "CHECKCARD &DAT{YYYY-MM-DD} &MerchTname &Merchaddystatecode CKCD &Attchcardlast4 XXXXXXXXXXXX&Attchcardlast4 &Attchcardlast4",
+      "description": "MerchTname - Title Case",
+      "result": "CHECKCARD 2026-03-06 Exxonmobil Richardson Ca Ckcd 5541 XXXXXXXXXXXX2910 2910"
+    },
+    {
+      "template": "CHECKCARD &DAT{YYYY-MM-DD} &merchtname &merchaddystatecode CKCD &attchcardlast4 XXXXXXXXXXXX&attchcardlast4 &attchcardlast4",
+      "description": "merchtname - lowercase",
+      "result": "CHECKCARD 2026-03-06 exxonmobil richardson ca ckcd 5541 XXXXXXXXXXXX2910 2910"
+    }
+  ]
+}

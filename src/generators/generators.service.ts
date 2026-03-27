@@ -73,7 +73,20 @@ export class GeneratorsService {
 
   // generateAtmId(ctx: GeneratorContext): string {
   generateAtmId(): string {
-    return this.randomNumeric(8);
+    const atmId = this.randomNumeric(8);
+    this.logger.debug(`Generated ATM ID: ${atmId}`);
+    return atmId;
+  }
+
+  generatePhoneNumber(): string {
+    // Генерирует американский номер телефона в формате XXX-XXX-XXXX
+    const areaCode = Math.floor(Math.random() * 900) + 100; // 100-999
+    const exchange = Math.floor(Math.random() * 900) + 100; // 100-999
+    const number = Math.floor(Math.random() * 10000); // 0000-9999
+    
+    const phoneNumber = `${areaCode}-${exchange}-${number.toString().padStart(4, '0')}`;
+    this.logger.debug(`Generated phone number: ${phoneNumber}`);
+    return phoneNumber;
   }
 
   private randomNumeric(length: number): string {

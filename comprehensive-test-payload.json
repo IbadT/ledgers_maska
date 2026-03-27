@@ -1,0 +1,210 @@
+{
+  "companyId": "1e4186d9-0cf5-4321-b366-0ec661ec4105",
+  "turnover": 100000.0,
+  "targetProfitPercent": 15.0,
+  "model": "B2B",
+  "initialBalance": 50000.0,
+  "scalingFactor": 2,
+  "customData": [
+    {"date": "2026-03-01T10:00:00Z", "amount": -100.0, "category": "Test", "method": "ACH"},
+    {"date": "2026-03-02T11:00:00Z", "amount": -200.0, "category": "Test", "method": "Wire"},
+    {"date": "2026-03-03T12:00:00Z", "amount": -300.0, "category": "Test", "method": "Card"},
+    {"date": "2026-03-04T13:00:00Z", "amount": -400.0, "category": "Test", "method": "ACH"},
+    {"date": "2026-03-05T14:00:00Z", "amount": -500.0, "category": "Test", "method": "Wire"}
+  ],
+  "customCustomers": [
+    {"name": "Customer 1", "category": "Wholesale Clients"},
+    {"name": "Customer 2", "category": "Retail Clients"},
+    {"name": "Customer 3", "category": "Agriculture Clients"}
+  ],
+  "customContractors": [
+    {"name": "Contractor 1", "category": "Software"},
+    {"name": "Contractor 2", "category": "Marketing"}
+  ],
+  "jobId": "comprehensive-test-all-types-2026-03-26",
+  "dailyBalances": [
+    {"balance": 50000.00, "date": "2026-03-01"},
+    {"balance": 49900.00, "date": "2026-03-02"},
+    {"balance": 49700.00, "date": "2026-03-03"},
+    {"balance": 49300.00, "date": "2026-03-04"},
+    {"balance": 48900.00, "date": "2026-03-05"},
+    {"balance": 48900.00, "date": "2026-03-06"},
+    {"balance": 48900.00, "date": "2026-03-07"},
+    {"balance": 48900.00, "date": "2026-03-08"},
+    {"balance": 48900.00, "date": "2026-03-09"},
+    {"balance": 48900.00, "date": "2026-03-10"},
+    {"balance": 48900.00, "date": "2026-03-11"},
+    {"balance": 48900.00, "date": "2026-03-12"},
+    {"balance": 48900.00, "date": "2026-03-13"},
+    {"balance": 48900.00, "date": "2026-03-14"},
+    {"balance": 48900.00, "date": "2026-03-15"},
+    {"balance": 48900.00, "date": "2026-03-16"},
+    {"balance": 48900.00, "date": "2026-03-17"},
+    {"balance": 48900.00, "date": "2026-03-18"},
+    {"balance": 48900.00, "date": "2026-03-19"},
+    {"balance": 48900.00, "date": "2026-03-20"},
+    {"balance": 48900.00, "date": "2026-03-21"},
+    {"balance": 48900.00, "date": "2026-03-22"},
+    {"balance": 48900.00, "date": "2026-03-23"},
+    {"balance": 48900.00, "date": "2026-03-24"},
+    {"balance": 48900.00, "date": "2026-03-25"},
+    {"balance": 48900.00, "date": "2026-03-26"}
+  ],
+  "forwardingInfo": {
+    "associatedCard": "2910",
+    "companyName": "Test Company",
+    "ownerName": "Test Owner",
+    "state": "CA",
+    "customContractors": {
+      "Software": ["Contractor 1"],
+      "Marketing": ["Contractor 2"]
+    },
+    "customCustomers": [
+      "Customer 1",
+      "Customer 2", 
+      "Customer 3"
+    ],
+    "cards": ["2910"]
+  },
+  "generatedAt": "2026-03-26T07:20:00Z",
+  "summary": {
+    "finalBalance": 58044.50,
+    "initialBalance": 50000.00,
+    "netProfit": 8044.50,
+    "totalRevenue": 18800.00,
+    "totalExpenses": 10755.50,
+    "totals": {
+      "totalRevenue": 18800.00,
+      "totalExpenses": 10755.50,
+      "netProfit": 8044.50
+    },
+    "revenueBreakdown": {
+      "totalAch": 0,
+      "totalWire": 2000.00,
+      "totalZelle": 800.00,
+      "totalGateway": 15000.00,
+      "totalOther": 1000.00
+    },
+    "expensesBreakdown": {
+      "byCard": 0,
+      "byAccount": 10755.50
+    },
+    "transactionCount": {
+      "total": 9,
+      "deposits": {
+        "total": 4,
+        "ach": 0,
+        "wire": 1,
+        "zelle": 1,
+        "gateway": 1,
+        "atm": 1
+      },
+      "withdrawals": {
+        "total": 5,
+        "fromAccount": 5,
+        "byCard": 0
+      }
+    }
+  },
+  "transactions": [
+    {
+      "transactionDate": "2026-03-26T10:00:00Z",
+      "postingDate": "2026-03-26",
+      "amount": 15000.00,
+      "balanceAfter": 65000.00,
+      "category": "Gateway Income",
+      "method": "ACH_DEBIT",
+      "isManual": false,
+      "type": "income",
+      "transactionId": "test-gateway-001"
+    },
+    {
+      "transactionDate": "2026-03-26T11:00:00Z",
+      "postingDate": "2026-03-26",
+      "amount": -3500.00,
+      "balanceAfter": 61500.00,
+      "category": "Payroll",
+      "method": "ACH_DEBIT",
+      "isManual": false,
+      "type": "expense",
+      "transactionId": "test-payroll-002"
+    },
+    {
+      "transactionDate": "2026-03-26T12:00:00Z",
+      "postingDate": "2026-03-26",
+      "amount": -85.50,
+      "balanceAfter": 61414.50,
+      "category": "Fuel",
+      "method": "ACH_DEBIT",
+      "isManual": false,
+      "type": "expense",
+      "transactionId": "test-fuel-003"
+    },
+    {
+      "transactionDate": "2026-03-26T13:00:00Z",
+      "postingDate": "2026-03-26",
+      "amount": -120.00,
+      "balanceAfter": 61294.50,
+      "category": "Gas Station",
+      "method": "ACH_DEBIT",
+      "isManual": false,
+      "type": "expense",
+      "transactionId": "test-gasstation-004"
+    },
+    {
+      "transactionDate": "2026-03-26T14:00:00Z",
+      "postingDate": "2026-03-26",
+      "amount": -250.00,
+      "balanceAfter": 61044.50,
+      "category": "Chassis Rental",
+      "method": "ACH_DEBIT",
+      "isManual": false,
+      "type": "expense",
+      "transactionId": "test-chassis-005"
+    },
+    {
+      "transactionDate": "2026-03-26T15:00:00Z",
+      "postingDate": "2026-03-26",
+      "amount": 800.00,
+      "balanceAfter": 61844.50,
+      "category": "Zelle",
+      "method": "ACH_DEBIT",
+      "isManual": false,
+      "type": "income",
+      "transactionId": "test-zelle-006"
+    },
+    {
+      "transactionDate": "2026-03-26T16:00:00Z",
+      "postingDate": "2026-03-26",
+      "amount": 2000.00,
+      "balanceAfter": 63844.50,
+      "category": "Wire",
+      "method": "ACH_DEBIT",
+      "isManual": false,
+      "type": "income",
+      "transactionId": "test-wire-007"
+    },
+    {
+      "transactionDate": "2026-03-26T17:00:00Z",
+      "postingDate": "2026-03-26",
+      "amount": 500.00,
+      "balanceAfter": 64344.50,
+      "category": "ATM Deposit",
+      "method": "ACH_DEBIT",
+      "isManual": false,
+      "type": "income",
+      "transactionId": "test-atm-008"
+    },
+    {
+      "transactionDate": "2026-03-26T18:00:00Z",
+      "postingDate": "2026-03-26",
+      "amount": -300.00,
+      "balanceAfter": 64044.50,
+      "category": "Owner Transfer",
+      "method": "ACH_DEBIT",
+      "isManual": false,
+      "type": "expense",
+      "transactionId": "test-owner-009"
+    }
+  ]
+}

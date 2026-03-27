@@ -13,4 +13,8 @@ export interface TemplateData {
   contractor?: string;
   gateway?: string;
   paydate?: string;
+  // Новые поля для &синтаксиса
+  merchantName?: string;
+  stateCode?: string;
+  sequentialNumbers?: Map<string, number>; // Для хранения счетчиков NUMUP
 }

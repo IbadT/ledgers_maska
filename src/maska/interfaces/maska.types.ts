@@ -29,7 +29,7 @@ export interface ProcessingContext {
   generators: GeneratorContext;
   contractorCache: Map<string, string[]>; // category_state → контрагенты
   coIdCache: Map<string, string>; // Уже сгенерированные CO ID
-  randomCache: Map<string, string>; // Для консистентности random
+  randomCache: Map<string, any>; // Для консистентности random (разные типы)
 }
 
 export interface CalculationDetails {

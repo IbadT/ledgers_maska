@@ -1,0 +1,28 @@
+{
+  "companyId": "1e4186d9-0cf5-4321-b366-0ec661ec4105",
+  "turnover": 100000.0,
+  "targetProfitPercent": 15.0,
+  "model": "B2B",
+  "initialBalance": 50000.0,
+  "scalingFactor": 2,
+  "customData": [
+    {"date": "2026-03-01T10:00:00Z", "amount": 15000.00, "category": "Gateway Income", "method": "ACH_DEBIT"},
+    {"date": "2026-03-02T11:00:00Z", "amount": -3500.00, "category": "Payroll", "method": "ACH_DEBIT"},
+    {"date": "2026-03-03T12:00:00Z", "amount": -85.50, "category": "Fuel", "method": "ACH_DEBIT"},
+    {"date": "2026-03-04T13:00:00Z", "amount": -120.00, "category": "Gas Station", "method": "ACH_DEBIT"},
+    {"date": "2026-03-05T14:00:00Z", "amount": -250.00, "category": "Chassis Rental", "method": "ACH_DEBIT"},
+    {"date": "2026-03-06T15:00:00Z", "amount": 800.00, "category": "Zelle", "method": "ACH_DEBIT"},
+    {"date": "2026-03-07T16:00:00Z", "amount": 2000.00, "category": "Wire", "method": "ACH_DEBIT"},
+    {"date": "2026-03-08T17:00:00Z", "amount": 500.00, "category": "ATM Deposit", "method": "ACH_DEBIT"},
+    {"date": "2026-03-09T18:00:00Z", "amount": -300.00, "category": "Owner Transfer", "method": "ACH_DEBIT"}
+  ],
+  "customCustomers": [
+    {"name": "Customer 1", "category": "Wholesale Clients"},
+    {"name": "Customer 2", "category": "Retail Clients"},
+    {"name": "Customer 3", "category": "Agriculture Clients"}
+  ],
+  "customContractors": [
+    {"name": "Contractor 1", "category": "Software"},
+    {"name": "Contractor 2", "category": "Marketing"}
+  ]
+}
